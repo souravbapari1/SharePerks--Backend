@@ -1,0 +1,32 @@
+{
+  "storeType": "online",
+  "codeType": "QR",
+  "brandId": "BRAND123",
+  "denominationList": [100, 200],
+  "isEnable": true,
+  "stockISIN": "ISIN123456",
+  "description": "Get exclusive vouchers for DISH TV.",
+  "taq": "Limited time offer!",
+  "redeemSteps": "1. Visit the website. 2. Enter your voucher code. 3. Enjoy your subscription.",
+  "couponImage": "http://images.vouchagram.net/coupons/sample_coupon.png",
+  "OnlineRedemptionUrl": "http://www.dishtv.com/redeem",
+  "data": {
+    "BrandProductCode": "DISHTVIoMchSmhREu26ySQ",
+    "BrandName": "DISH TV",
+    "Brandtype": "VOUCHER",
+    "RedemptionType": "ONLINE",
+    "OnlineRedemptionUrl": "http://www.dishtv.com/redeem",
+    "BrandImage": "http://images.vouchagram.net/brand/A2B13291-D3A8-4215-B638-CCB393B5ADEC/DISHTV.png",
+    "denominationList": "99,149,299",
+    "stockAvailable": "true",
+    "Category": "Gifting",
+    "Descriptions": "Exclusive DISH TV voucher for entertainment.",
+    "tnc": "Terms and conditions apply.",
+    "importantInstruction": "Redeem within 30 days of purchase.",
+    "redeemSteps": "Visit the link and enter your voucher code.",
+    "updated_at": "2023-12-04T11:29:32.000Z"
+  },
+  "inStockPercent": 20,
+  "withoutStockPercent": 50,
+  "offlineStoreAddress": {}
+}
