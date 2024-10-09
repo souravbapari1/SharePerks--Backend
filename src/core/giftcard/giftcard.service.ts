@@ -31,7 +31,8 @@ import { LogService } from 'src/global/log/log.service';
 export class GiftcardService {
   private cahFreeApi = 'https://sandbox.cashfree.com';
   private cashFreeClientID = 'TEST102842697ad690418252d855b7f996248201';
-  private cashFreeClientSecret = process.env.CashFreeClientSecret;
+  private cashFreeClientSecret =
+    'cfsk_ma_test_68d82df1eb052f21339a5295bff9841d_9eb0f511';
 
   private cashFreeHeader = {
     accept: 'application/json',
