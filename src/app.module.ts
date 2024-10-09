@@ -29,9 +29,11 @@ import { AppcontentModule } from './core/appcontent/appcontent.module';
 import { TrackerModule } from './core/tracker/tracker.module';
 import { DashbordModule } from './core/dashbord/dashbord.module';
 import { GiftcardModule } from './core/giftcard/giftcard.module';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
+    ConfigModule.forRoot(),
     JwtModule.register({
       global: true,
       secret: jwtKey,
