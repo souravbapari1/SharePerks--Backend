@@ -35,7 +35,7 @@ async function bootstrap() {
   SwaggerModule.setup('api/v1/docs', app, document); // Added prefix 'api/v1' to the Swagger docs route
 
   // Start the application
-  await app.listen(3000);
+  await app.listen(7565);
 }
 
 bootstrap();

@@ -88,9 +88,9 @@ export class DashbordService {
     ]);
 
     return (
-      couponClicks[0].totalClicks +
-      offersClicks[0].totalClicks +
-      brandsClicks[0].totalClicks
+      (couponClicks[0]?.totalClicks || 0) +
+      (offersClicks[0]?.totalClicks || 0) +
+      (brandsClicks[0]?.totalClicks || 0)
     );
   }
 
