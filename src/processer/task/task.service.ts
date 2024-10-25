@@ -64,4 +64,14 @@ export class TaskService {
       console.log(error.message || error);
     }
   }
+
+  @Cron(CronExpression.EVERY_DAY_AT_1AM)
+  async handleAdmitedCampaines() {
+    try {
+      await this.amitedService.storeAllCompanies();
+      this.log.log('@CRON - Update Admited get All data on Camoains');
+    } catch (error) {
+      console.log(error.message || error);
+    }
+  }
 }

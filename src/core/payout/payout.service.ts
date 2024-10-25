@@ -12,6 +12,7 @@ import { Bank, BankDocument } from 'src/schemas/bank.schema';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import { LogType } from 'src/constants/constents';
 import { UpdatePayoutDto } from './dto/updatePayout.dto';
+import { NotificationService } from 'src/global/notification/notification.service';
 
 @Injectable()
 export class PayoutService {
@@ -23,6 +24,7 @@ export class PayoutService {
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
     private readonly logService: LogService,
+    private readonly notification: NotificationService,
   ) {}
   async createNewPayout(data: CreatePayoutDto) {
     if (!isValidObjectId(data.bank)) {
@@ -59,6 +61,11 @@ export class PayoutService {
       data: data,
       description: `new payout request ${data.amount} rs`,
     });
+    await this.notification.sendNotificationQuickUser({
+      id: userInfo._id.toString(),
+      title: `Payout Request Send`,
+      message: `Your payout request ${data.amount} rs send successfully`,
+    });
     //==================
 
     data.bank = bankExist;
@@ -75,8 +82,14 @@ export class PayoutService {
     delete data.user;
     delete data.amount;
 
-    const task = await this.payoutModel.updateOne({ _id: id }, data);
+    const task = await this.payoutModel.findOneAndUpdate({ _id: id }, data);
+    const user = await this.userModel.findOne({ _id: task.user });
 
+    await this.notification.sendNotificationQuickUser({
+      id: user._id.toString(),
+      title: `Payout has been ${data.status}`,
+      message: `Your payout request has been ${data.status}`,
+    });
     return {
       status: true,
       message: 'payout request update successfully',

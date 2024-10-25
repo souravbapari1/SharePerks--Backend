@@ -8,6 +8,7 @@ import { Brand, BrandSchema } from 'src/schemas/brand.schema';
 import { Coupon, CouponSchema } from 'src/schemas/coupons.schema';
 import { TransitionModule } from 'src/core/transition/transition.module';
 import { Transitions, TransitionsSchema } from 'src/schemas/transitions.schema';
+import { Admitad, AdmitadSchema } from 'src/schemas/admitad/admitad.schema';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { Transitions, TransitionsSchema } from 'src/schemas/transitions.schema';
       { name: Brand.name, schema: BrandSchema },
       { name: Coupon.name, schema: CouponSchema },
       { name: Transitions.name, schema: TransitionsSchema },
+      { name: Admitad.name, schema: AdmitadSchema },
     ]),
     TransitionModule,
   ],

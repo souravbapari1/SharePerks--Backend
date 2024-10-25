@@ -30,7 +30,7 @@ import { TrackerModule } from './core/tracker/tracker.module';
 import { DashbordModule } from './core/dashbord/dashbord.module';
 import { GiftcardModule } from './core/giftcard/giftcard.module';
 import { ConfigModule } from '@nestjs/config';
-
+import { NotificationModule } from './global/notification/notification.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -65,6 +65,7 @@ import { ConfigModule } from '@nestjs/config';
     TrackerModule,
     DashbordModule,
     GiftcardModule,
+    NotificationModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],

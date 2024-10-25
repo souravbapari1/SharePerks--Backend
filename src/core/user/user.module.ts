@@ -12,6 +12,10 @@ import { Admin, AdminSchema } from 'src/schemas/admin.schema';
 import { Payout, PayoutSchema } from 'src/schemas/payouts.schema';
 import { TrackerModule } from '../tracker/tracker.module';
 import { TransitionModule } from '../transition/transition.module';
+import {
+  Notification,
+  NotificationSchema,
+} from 'src/schemas/notification.schema';
 
 @Module({
   imports: [
@@ -21,6 +25,7 @@ import { TransitionModule } from '../transition/transition.module';
       { name: Holdings.name, schema: HoldingsSchema },
       { name: Bank.name, schema: BankSchema },
       { name: Payout.name, schema: PayoutSchema },
+      { name: Notification.name, schema: NotificationSchema },
     ]),
     TrackerModule,
     TransitionModule,

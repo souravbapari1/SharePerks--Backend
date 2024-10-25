@@ -169,6 +169,15 @@ export class OffersService {
       .map((e) => ({ ...e, isExpired: false }));
   }
 
+  async getOffersByBrokerActive(stockISIN: string) {
+    const task = await this.offersModel
+      .find({ isEnable: true, stockISIN: stockISIN })
+      .lean();
+    return task
+      .filter((e) => !this.isExpired(e.expDate.toISOString()))
+      .map((e) => ({ ...e, isExpired: false }));
+  }
+
   private isExpired(expDate: string): boolean {
     // Create a Date object from the expiration date string
     const date = new Date(expDate);

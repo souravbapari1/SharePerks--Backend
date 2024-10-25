@@ -15,12 +15,18 @@ import { AdminDto } from './dto/admin.dto';
 import { LogType } from 'src/constants/constents';
 import { Payout, PayoutDocument } from 'src/schemas/payouts.schema';
 import { TransitionService } from '../transition/transition.service';
+import {
+  Notification,
+  NotificationDocument,
+} from 'src/schemas/notification.schema';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectModel(User.name) private readonly UserModel: Model<User>,
     @InjectModel(Admin.name) private readonly adminModel: Model<AdminDocument>,
+    @InjectModel(Notification.name)
+    private readonly notificationModel: Model<NotificationDocument>,
 
     @InjectModel(Holdings.name)
     private readonly HoldingsModel: Model<HoldingsDocument>,
@@ -161,5 +167,17 @@ export class UserService {
       logs: logs,
       payouts: payouts,
     };
+  }
+
+  // get use rnOtofication
+
+  async getUserNotification(id: string) {
+    const data = await this.notificationModel.find({ user: id }).lean();
+    return data;
+  }
+
+  async deleteUserNotification(id: string) {
+    const data = await this.notificationModel.deleteMany({ user: id });
+    return data;
   }
 }

@@ -53,6 +53,11 @@ export class OffersController {
     return await this.offerService.getOffersByCategoryActive(id);
   }
 
+  @Get('broker/:id')
+  async getOfferByBroker(@Param('id') id: string) {
+    return await this.offerService.getOffersByBrokerActive(id);
+  }
+
   @Post()
   @UseGuards(AdminGuard)
   @UseInterceptors(

@@ -6,6 +6,8 @@ import { Payout, PayoutSchema } from 'src/schemas/payouts.schema';
 import { LogModule } from 'src/global/log/log.module';
 import { Bank, BankSchema } from 'src/schemas/bank.schema';
 import { User, UserSchema } from 'src/schemas/user.schema';
+import { NotificationModule } from 'src/global/notification/notification.module';
+import { NotificationService } from 'src/global/notification/notification.service';
 
 @Module({
   imports: [
@@ -15,6 +17,7 @@ import { User, UserSchema } from 'src/schemas/user.schema';
       { name: User.name, schema: UserSchema },
     ]),
     LogModule,
+    NotificationModule,
   ],
   controllers: [PayoutController],
   providers: [PayoutService],

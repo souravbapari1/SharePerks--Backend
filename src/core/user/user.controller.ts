@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   Patch,
@@ -24,6 +25,18 @@ import { AdminDto } from './dto/admin.dto';
 @Controller('user')
 export class UserController {
   constructor(private userService: UserService) {}
+
+  @Get('notifications/:id')
+  @UseGuards(AuthUserGuard)
+  async getUserNotification(@Param('id') id: string) {
+    return await this.userService.getUserNotification(id);
+  }
+
+  @Delete('notifications/:id')
+  @UseGuards(AuthUserGuard)
+  async deleteUserNotification(@Param('id') id: string) {
+    return await this.userService.deleteUserNotification(id);
+  }
 
   @UseGuards(AuthUserGuard)
   @Get()
