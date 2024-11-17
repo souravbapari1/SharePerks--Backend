@@ -4,6 +4,7 @@ import { VouchagramService } from './vouchagram/vouchagram.service';
 import { CuelinksService } from './cuelinks/cuelinks.service';
 import { AdmitadService } from './admitad/admitad.service';
 import { CommitionService } from './commition/commition.service';
+import { WhoowService } from './whoow/whoow.service';
 
 @Injectable()
 export class TaskService {
@@ -12,6 +13,7 @@ export class TaskService {
     private readonly cuelinksService: CuelinksService,
     private readonly amitedService: AdmitadService,
     private readonly commitionService: CommitionService,
+    private readonly whoowService: WhoowService,
   ) {}
   private log = new Logger();
   @Cron(CronExpression.EVERY_12_HOURS)
@@ -70,6 +72,16 @@ export class TaskService {
     try {
       await this.amitedService.storeAllCompanies();
       this.log.log('@CRON - Update Admited get All data on Camoains');
+    } catch (error) {
+      console.log(error.message || error);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_30_SECONDS)
+  async handleWhoowCategory() {
+    try {
+      await this.whoowService.getCategories();
+      this.log.log('@CRON - Update Whoow get All data on Category');
     } catch (error) {
       console.log(error.message || error);
     }
