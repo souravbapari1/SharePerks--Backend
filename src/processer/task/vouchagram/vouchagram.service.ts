@@ -24,6 +24,11 @@ import {
   VouchagramBrands,
   VouchagramBrandsDocument,
 } from 'src/schemas/vouchagram/vouchagramBrnds.schema';
+import {
+  VouchagramError,
+  VouchagramErrorDocument,
+} from 'src/schemas/vouchagram/vouchagramError.schema';
+import { Payment, PaymentDocument } from 'src/schemas/payment.schema';
 
 @Injectable()
 export class VouchagramService {
@@ -41,6 +46,11 @@ export class VouchagramService {
     private readonly vouchagramBrandsVouchagramBrandsModel: Model<VouchagramBrandsDocument>,
     @InjectModel(VouchagramStores.name)
     private readonly vouchagramStoresModel: Model<VouchagramStoresDocument>,
+    @InjectModel(VouchagramError.name)
+    private readonly vouchagramErrorModel: Model<VouchagramErrorDocument>,
+
+    @InjectModel(Payment.name)
+    private readonly paymentModel: Model<PaymentDocument>,
   ) {
     this.key = '6d66fb7debfd15bf716bb14752b9603b';
     this.iv = '716bb14752b9603b';
@@ -97,17 +107,14 @@ export class VouchagramService {
         },
       );
 
+    console.log(req.data);
+
     if (req.data.code !== '0000') {
       throw new InternalServerErrorException(errorDataSet[req.data.code]);
     }
 
     const voucherData = this.decrypt(req.data.data);
     const voucher: VoucherData = JSON.parse(voucherData);
-    console.log(voucher);
-
-    console.log(voucher.PullVouchers[0]);
-    console.log(voucher.PullVouchers[0].Vouchers);
-
     return voucher;
   }
 
@@ -253,12 +260,17 @@ export class VouchagramService {
     }
   }
 
-  async pullVouchers(data: {
-    BrandProductCode: string;
-    Denomination: string;
-    Quantity: number;
-    ExternalOrderId: string;
-  }) {
+  async pullVouchers(
+    data: {
+      BrandProductCode: string;
+      Denomination: string;
+      Quantity: number;
+      ExternalOrderId: string;
+      user: string;
+      paymentId: string;
+    },
+    tryAgain: boolean = false,
+  ) {
     try {
       const token = await this.getToken(true);
       const payload = this.encrypt(data);
@@ -275,17 +287,51 @@ export class VouchagramService {
             },
           },
         );
+      console.log(res.data);
 
-      if (res.data.code !== '0000') {
-        throw new InternalServerErrorException(errorDataSet[res.data.code]);
+      const timeOutCOdes = [
+        'ER047',
+        'ER1057',
+        'ER1056',
+        'ER1006',
+        'EROIP',
+        '1048',
+      ];
+      if (timeOutCOdes.includes(res.data.code)) {
+        await this.vouchagramErrorModel.create({
+          BrandProductCode: data.BrandProductCode,
+          Denomination: data.Denomination,
+          Quantity: data.Quantity,
+          ExternalOrderId: data.ExternalOrderId,
+          user: data.user,
+          paymentId: data.paymentId,
+        });
+        throw new InternalServerErrorException(
+          res?.data?.desc || 'Timeout Error In Request Under Processing',
+        );
       }
 
+      if (res.data.code !== '0000') {
+        await this.vouchagramErrorModel.create({
+          BrandProductCode: data.BrandProductCode,
+          Denomination: data.Denomination,
+          Quantity: data.Quantity,
+          ExternalOrderId: data.ExternalOrderId,
+          user: data.user,
+          paymentId: data.paymentId,
+          isRetry: true,
+        });
+        throw new InternalServerErrorException(errorDataSet[res.data.code]);
+      }
       const pullData = JSON.parse(this.decrypt(res.data.data));
       // Ensure storesData is an array
       return pullData;
-    } catch (error) {
-      console.error(error); // Log the actual error for better debugging
-      throw new InternalServerErrorException('Error getting vouchagram stores');
+    } catch (error: any) {
+      console.log('==============================');
+      throw new InternalServerErrorException(
+        error?.response?.message ||
+          'Error to Generate Voucher Please Try again',
+      );
     }
   }
 
@@ -326,11 +372,37 @@ export class VouchagramService {
 
       return tokenData.token;
     } catch (error) {
-      console.error(error);
+      console.log('=============================');
+
+      console.error('------', error.message);
       throw new InternalServerErrorException(
-        'Error generating vouchagram token',
+        error?.message || 'Error generating vouchagram token',
       );
     }
+  }
+
+  async retryFailedCoupons() {
+    const data = await this.vouchagramErrorModel.find({ isRetry: false });
+
+    data.forEach(async (e) => {
+      try {
+        const res = await this.getVoucherStatus(e.ExternalOrderId);
+        await this.paymentModel.updateOne(
+          { _id: e.ExternalOrderId },
+          {
+            completePurchase: true,
+            giftCard: res,
+          },
+        );
+        await e.deleteOne();
+      } catch (error) {
+        console.log(error);
+      } finally {
+        await e.updateOne({
+          isRetry: true,
+        });
+      }
+    });
   }
 
   private async newTokenRequest() {

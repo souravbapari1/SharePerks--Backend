@@ -1,11 +1,4 @@
-import {
-  IsArray,
-  IsBoolean,
-  IsNotEmpty,
-  IsNumber,
-  IsOptional,
-  IsString,
-} from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class OfflineStoreAddressDto {
   @IsOptional()
@@ -52,9 +45,9 @@ export class CreateGiftCardDto {
   @IsString()
   description: string;
 
-  @IsNotEmpty()
+  @IsOptional()
   @IsString()
-  taq: string;
+  taq?: string;
 
   @IsOptional()
   @IsString()

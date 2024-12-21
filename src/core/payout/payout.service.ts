@@ -61,11 +61,11 @@ export class PayoutService {
       data: data,
       description: `new payout request ${data.amount} rs`,
     });
-    await this.notification.sendNotificationQuickUser({
-      id: userInfo._id.toString(),
-      title: `Payout Request Send`,
-      message: `Your payout request ${data.amount} rs send successfully`,
-    });
+    // await this.notification.sendNotificationQuickUser({
+    //   id: userInfo._id.toString(),
+    //   title: `Payout Request Send`,
+    //   message: `Your payout request ${data.amount} rs send successfully`,
+    // });
     //==================
 
     data.bank = bankExist;
@@ -85,11 +85,11 @@ export class PayoutService {
     const task = await this.payoutModel.findOneAndUpdate({ _id: id }, data);
     const user = await this.userModel.findOne({ _id: task.user });
 
-    await this.notification.sendNotificationQuickUser({
-      id: user._id.toString(),
-      title: `Payout has been ${data.status}`,
-      message: `Your payout request has been ${data.status}`,
-    });
+    // await this.notification.sendNotificationQuickUser({
+    //   id: user._id.toString(),
+    //   title: `Payout has been ${data.status}`,
+    //   message: `Your payout request has been ${data.status}`,
+    // });
     return {
       status: true,
       message: 'payout request update successfully',

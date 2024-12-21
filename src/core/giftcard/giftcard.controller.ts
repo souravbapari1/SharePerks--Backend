@@ -11,16 +11,15 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { GiftcardService } from './giftcard.service';
-import { AuthUserGuard } from 'src/guards/user.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { storage } from 'src/config/storage.config';
+import { AuthUserGuard } from 'src/guards/user.guard';
 import {
-  createFileFilter,
   FileValidationPipe,
+  createFileFilter,
 } from 'src/pipes/file-validate/file-validate.pipe';
 import { CreateGiftCardDto, UpdateGiftCardDto } from './giftcard.dto';
-import { UserDto } from '../user/dto/user.dto';
+import { GiftcardService } from './giftcard.service';
 
 @Controller('giftcard')
 export class GiftcardController {

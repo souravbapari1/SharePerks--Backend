@@ -8,33 +8,31 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { GiftCard, GiftCardDocument } from 'src/schemas/giftcard.schema';
 
-import { CreateGiftCardDto, UpdateGiftCardDto } from './giftcard.dto';
 import {
   VouchagramBrands,
   VouchagramBrandsDocument,
 } from 'src/schemas/vouchagram/vouchagramBrnds.schema';
+import { CreateGiftCardDto, UpdateGiftCardDto } from './giftcard.dto';
 
+import { HttpService } from '@nestjs/axios';
+import { LogService } from 'src/global/log/log.service';
+import { VouchagramService } from 'src/processer/task/vouchagram/vouchagram.service';
+import { Brand, BrandDocument } from 'src/schemas/brand.schema';
+import { Payment, PaymentDocument } from 'src/schemas/payment.schema';
+import { User, UserDocument } from 'src/schemas/user.schema';
 import {
   VouchagramStores,
   VouchagramStoresDocument,
 } from 'src/schemas/vouchagram/vouchagramStores.schema';
-import { Brand, BrandDocument } from 'src/schemas/brand.schema';
-import { VouchagramService } from 'src/processer/task/vouchagram/vouchagram.service';
-import { UserDto } from '../user/dto/user.dto';
-import { HttpService } from '@nestjs/axios';
-import { randomUUID } from 'crypto';
-import { Payment, PaymentDocument } from 'src/schemas/payment.schema';
-import { User, UserDocument } from 'src/schemas/user.schema';
-import { LogService } from 'src/global/log/log.service';
 
 @Injectable()
 export class GiftcardService {
-  private cahFreeApi = 'https://sandbox.cashfree.com';
+  public cahFreeApi = 'https://sandbox.cashfree.com';
   private cashFreeClientID = 'TEST102842697ad690418252d855b7f996248201';
   private cashFreeClientSecret =
     'cfsk_ma_test_68d82df1eb052f21339a5295bff9841d_9eb0f511';
 
-  private cashFreeHeader = {
+  public cashFreeHeader = {
     accept: 'application/json',
     'content-type': 'application/json',
     'x-api-version': '2023-08-01',
@@ -287,6 +285,8 @@ export class GiftcardService {
             Denomination: findOrder.denomination,
             Quantity: 1,
             ExternalOrderId: id,
+            user: findOrder.user.toString(),
+            paymentId: id,
           });
           try {
             await this.logService.createNewLog({
@@ -313,6 +313,8 @@ export class GiftcardService {
 
       return finalOrder;
     } catch (error: any) {
+      console.log('-------------------------------------------------------');
+
       // Log the error properly
       console.error(
         'Payment verification failed:',
@@ -320,7 +322,9 @@ export class GiftcardService {
       );
 
       throw new BadRequestException(
-        'Payment verification failed. Please try again.',
+        error?.response?.data ||
+          error?.message ||
+          'Payment verification failed. Please try again.',
       );
     }
   }

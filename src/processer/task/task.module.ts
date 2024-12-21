@@ -4,7 +4,7 @@ import { VouchagramModule } from './vouchagram/vouchagram.module';
 import { CuelinksModule } from './cuelinks/cuelinks.module';
 import { AdmitadModule } from './admitad/admitad.module';
 import { CommitionModule } from './commition/commition.module';
-import { WhoowModule } from './whoow/whoow.module';
+import { WhoowApiModule } from './whoow/whoow.module';
 
 @Module({
   imports: [
@@ -12,7 +12,7 @@ import { WhoowModule } from './whoow/whoow.module';
     CuelinksModule,
     AdmitadModule,
     CommitionModule,
-    WhoowModule,
+    WhoowApiModule,
   ],
   providers: [TaskService],
 })

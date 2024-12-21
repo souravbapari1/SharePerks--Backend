@@ -15,6 +15,11 @@ import {
   VouchagramBrands,
   VouchagramBrandsSchema,
 } from 'src/schemas/vouchagram/vouchagramBrnds.schema';
+import {
+  VouchagramError,
+  vouchagramErrorSchema,
+} from 'src/schemas/vouchagram/vouchagramError.schema';
+import { Payment, PaymentSchema } from 'src/schemas/payment.schema';
 
 @Module({
   imports: [
@@ -23,6 +28,8 @@ import {
       { name: VouchagramToken.name, schema: VouchagramTokenSchema },
       { name: VouchagramBrands.name, schema: VouchagramBrandsSchema },
       { name: VouchagramStores.name, schema: VouchagramStoresSchema },
+      { name: VouchagramError.name, schema: vouchagramErrorSchema },
+      { name: Payment.name, schema: PaymentSchema },
     ]),
   ],
   providers: [VouchagramService],

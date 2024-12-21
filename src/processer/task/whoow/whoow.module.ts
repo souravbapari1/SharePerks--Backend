@@ -1,10 +1,11 @@
 import { Module } from '@nestjs/common';
-import { WhoowService } from './whoow.service';
+import { WhoowApiService } from './whoow.service';
 import { HttpModule, HttpService } from '@nestjs/axios';
+import { UserService } from 'src/core/user/user.service';
 
 @Module({
   imports: [HttpModule],
-  providers: [WhoowService],
-  exports: [WhoowService],
+  providers: [WhoowApiService],
+  exports: [WhoowApiService],
 })
-export class WhoowModule {}
+export class WhoowApiModule {}

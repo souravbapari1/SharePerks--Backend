@@ -31,6 +31,8 @@ import { DashbordModule } from './core/dashbord/dashbord.module';
 import { GiftcardModule } from './core/giftcard/giftcard.module';
 import { ConfigModule } from '@nestjs/config';
 import { NotificationModule } from './global/notification/notification.module';
+import { WhoowModule } from './core/whoow/whoow.module';
+import { GiftcardService } from './core/giftcard/giftcard.service';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -66,6 +68,7 @@ import { NotificationModule } from './global/notification/notification.module';
     DashbordModule,
     GiftcardModule,
     NotificationModule,
+    WhoowModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],
