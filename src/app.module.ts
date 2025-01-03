@@ -33,6 +33,8 @@ import { ConfigModule } from '@nestjs/config';
 import { NotificationModule } from './global/notification/notification.module';
 import { WhoowModule } from './core/whoow/whoow.module';
 import { GiftcardService } from './core/giftcard/giftcard.service';
+import { CashFreeModule } from './global/cash-free/cash-free.module';
+import { GiftcardorderModule } from './core/giftcardorder/giftcardorder.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -69,6 +71,8 @@ import { GiftcardService } from './core/giftcard/giftcard.service';
     GiftcardModule,
     NotificationModule,
     WhoowModule,
+    CashFreeModule,
+    GiftcardorderModule,
   ],
   controllers: [AuthController],
   providers: [AuthService],

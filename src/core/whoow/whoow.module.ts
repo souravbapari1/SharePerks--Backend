@@ -10,6 +10,11 @@ import { WhoowController } from './whoow.controller';
 import { WhoowService } from './whoow.service';
 import { LogModule } from 'src/global/log/log.module';
 import { WhoowApiModule } from 'src/processer/task/whoow/whoow.module';
+import {
+  VouchagramError,
+  vouchagramErrorSchema,
+} from 'src/schemas/vouchagram/vouchagramError.schema';
+import { GiftcardorderModule } from '../giftcardorder/giftcardorder.module';
 
 @Module({
   imports: [
@@ -20,6 +25,10 @@ import { WhoowApiModule } from 'src/processer/task/whoow/whoow.module';
       { name: Brand.name, schema: BrandSchema },
       { name: Payment.name, schema: PaymentSchema },
       { name: User.name, schema: UserSchema },
+      {
+        name: VouchagramError.name,
+        schema: vouchagramErrorSchema,
+      },
     ]),
     LogModule,
     WhoowApiModule,

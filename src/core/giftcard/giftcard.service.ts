@@ -53,8 +53,8 @@ export class GiftcardService {
     @InjectModel(Payment.name)
     private readonly paymentModel: Model<PaymentDocument>,
     private readonly vouchagramService: VouchagramService,
-    private readonly httpService: HttpService,
     private readonly logService: LogService,
+    private readonly httpService: HttpService,
   ) {}
 
   async getGites(type: string) {

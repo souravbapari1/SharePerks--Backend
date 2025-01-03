@@ -69,9 +69,9 @@ do
     esac
     
     if [ -z "$path" ]; then
-        nest g $schematic $name
+     npx   nest g $schematic $name
     else
-        nest g $schematic $name $path
+       npx nest g $schematic $name $path
     fi
 done
 

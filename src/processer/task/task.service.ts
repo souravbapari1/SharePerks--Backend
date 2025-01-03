@@ -1,12 +1,10 @@
-import { Type } from 'class-transformer';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
-import { VouchagramService } from './vouchagram/vouchagram.service';
-import { CuelinksService } from './cuelinks/cuelinks.service';
 import { AdmitadService } from './admitad/admitad.service';
 import { CommitionService } from './commition/commition.service';
+import { CuelinksService } from './cuelinks/cuelinks.service';
+import { VouchagramService } from './vouchagram/vouchagram.service';
 import { WhoowApiService } from './whoow/whoow.service';
-import { UserService } from 'src/core/user/user.service';
 
 @Injectable()
 export class TaskService {
@@ -103,9 +101,9 @@ export class TaskService {
   // async WhoowConfig() {
   //   try {
   //     const res = await this.vouchagramService.pullVouchers({
-  //       BrandProductCode: 'BakingoPromoCode6jltDI6idaSMGUTS',
-  //       Denomination: '799',
-  //       ExternalOrderId: 'ORDER_ID_5535',
+  // BrandProductCode: 'BakingoPromoCode6jltDI6idaSMGUTS',
+  // Denomination: '799',
+  // ExternalOrderId: 'ORDER_ID_5535',
   //       paymentId: '671b341c1a4346549c2918d1',
   //       Quantity: 1,
   //       user: '670643221e60757c08988f75',

@@ -20,16 +20,22 @@ import {
   vouchagramErrorSchema,
 } from 'src/schemas/vouchagram/vouchagramError.schema';
 import { Payment, PaymentSchema } from 'src/schemas/payment.schema';
+import {
+  GiftCardErrors,
+  GiftCardErrorsSchema,
+} from 'src/schemas/payment/errorcards.schema';
 
 @Module({
   imports: [
     HttpModule,
+
     MongooseModule.forFeature([
       { name: VouchagramToken.name, schema: VouchagramTokenSchema },
       { name: VouchagramBrands.name, schema: VouchagramBrandsSchema },
       { name: VouchagramStores.name, schema: VouchagramStoresSchema },
       { name: VouchagramError.name, schema: vouchagramErrorSchema },
       { name: Payment.name, schema: PaymentSchema },
+      { name: GiftCardErrors.name, schema: GiftCardErrorsSchema },
     ]),
   ],
   providers: [VouchagramService],

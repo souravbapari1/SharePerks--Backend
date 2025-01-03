@@ -18,6 +18,11 @@ import { HttpService } from '@nestjs/axios';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import { LogService } from 'src/global/log/log.service';
 import { WhoowApiService } from 'src/processer/task/whoow/whoow.service';
+import {
+  VouchagramError,
+  VouchagramErrorDocument,
+} from 'src/schemas/vouchagram/vouchagramError.schema';
+import { dataTagSymbol } from '@tanstack/react-query';
 
 @Injectable()
 export class WhoowService {
@@ -28,6 +33,8 @@ export class WhoowService {
     private readonly brandModel: Model<BrandDocument>,
     @InjectModel(Payment.name)
     private readonly paymentModel: Model<PaymentDocument>,
+    @InjectModel(VouchagramError.name)
+    private readonly vouchagramErrorModel: Model<VouchagramErrorDocument>,
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
     private readonly giftCardService: GiftcardService,
@@ -197,13 +204,13 @@ export class WhoowService {
   }
 
   async verifyPayment(id: string) {
-    try {
-      const existOrder = await this.paymentModel.findOne({ _id: id }).lean();
-      console.log(existOrder);
+    const existOrder = await this.paymentModel.findOne({ _id: id }).lean();
+    console.log(existOrder);
 
-      if (!existOrder) {
-        throw new NotFoundException('Order not found');
-      }
+    if (!existOrder) {
+      throw new NotFoundException('Order not found');
+    }
+    try {
       // Make an HTTP request to create the payment session
       const reqPaymentVerify = await this.httpService.axiosRef.get(
         this.giftCardService.cahFreeApi + '/pg/orders/' + id,
@@ -235,6 +242,9 @@ export class WhoowService {
             upi: 'test@pnb',
             user,
           });
+          console.log('=======================================');
+
+          console.log(pullVoucher);
 
           try {
             await this.logService.createNewLog({
@@ -247,10 +257,11 @@ export class WhoowService {
           } catch (error) {
             console.log(error);
           }
+
           await this.paymentModel.updateOne(
             { _id: id },
             {
-              completePurchase: true,
+              completePurchase: pullVoucher.status == 'COMPLETE',
               giftCard: pullVoucher,
             },
           );
@@ -266,6 +277,15 @@ export class WhoowService {
         'Payment verification failed:',
         error?.response?.data || error.message,
       );
+      await this.vouchagramErrorModel.create({
+        BrandProductCode: existOrder.brandProductCode,
+        Denomination: existOrder.denomination,
+        Quantity: 1,
+        ExternalOrderId: existOrder._id,
+        user: existOrder.user,
+        paymentId: id,
+        isRetry: true,
+      });
 
       throw new BadRequestException(
         error?.response?.data?.message ||
