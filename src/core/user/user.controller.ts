@@ -35,6 +35,8 @@ export class UserController {
   @Delete('notifications/:id')
   @UseGuards(AuthUserGuard)
   async deleteUserNotification(@Param('id') id: string) {
+    console.log('Delete Notifucations');
+
     return await this.userService.deleteUserNotification(id);
   }
 
@@ -46,13 +48,21 @@ export class UserController {
 
   @UseGuards(AuthUserGuard)
   @Put()
+  @UseInterceptors(
+    FileInterceptor('image', {
+      storage,
+      fileFilter: createFileFilter(['.jpg', '.jpeg', '.png'], 8 * 1024 * 1024),
+    }),
+  )
   async updateUser(
     @Request() req: Request & { user: UserDto },
     @Body() body: UserDto,
+    @UploadedFile() image?: Express.Multer.File,
   ) {
-    return await this.userService.updateUser(req.user, body);
+    return await this.userService.updateUser(req.user, body, image);
   }
 
+  @UseGuards(AuthUserGuard)
   @UseGuards(AuthUserGuard)
   @Post('holdings')
   async importHoldings(

@@ -41,6 +41,25 @@ export class CashFreeService {
     });
     return reqPaymentVerify.data;
   }
+
+  async refund(
+    orderId: string,
+    data: {
+      refund_amount: number;
+      refund_id: string;
+      refund_note: string;
+      refund_speed: 'STANDARD';
+    },
+  ) {
+    const reqPaymentVerify = await this.httpService.axiosRef.post<any>(
+      this.cahFreeApi + '/pg/orders/' + orderId + '/refunds',
+      data,
+      {
+        headers: this.cashFreeHeader,
+      },
+    );
+    return reqPaymentVerify.data;
+  }
 }
 
 type OrderPayment = {

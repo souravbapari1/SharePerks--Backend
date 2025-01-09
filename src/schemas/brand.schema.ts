@@ -30,20 +30,10 @@ export class Brand {
   stockISIN: string;
 
   @Prop()
-  offerTerms: [
-    {
-      content: string;
-      title: string;
-    },
-  ];
+  offerTerms: string;
 
   @Prop()
-  cashBackRates: [
-    {
-      title: string;
-      value: number;
-    },
-  ];
+  cashBackRates: string;
 
   @Prop()
   aboutBrand: string;
@@ -53,9 +43,6 @@ export class Brand {
 
   @Prop()
   brandImage: string;
-
-  @Prop()
-  discountHighLights: string;
 }
 
 export const BrandSchema = SchemaFactory.createForClass(Brand);

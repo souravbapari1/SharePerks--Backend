@@ -6,9 +6,6 @@ export type WhoohCardDocument = HydratedDocument<WhooCard>;
 @Schema({ timestamps: true })
 export class WhooCard {
   @Prop()
-  brandId: mongoose.Schema.Types.ObjectId;
-
-  @Prop()
   description: string;
 
   @Prop({ type: mongoose.Schema.Types.Mixed })
@@ -22,6 +19,12 @@ export class WhooCard {
 
   @Prop()
   GiftCardImage: string;
+
+  @Prop()
+  previewImage: string;
+
+  @Prop()
+  brandName: string;
 
   @Prop()
   taq: string;

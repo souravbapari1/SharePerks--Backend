@@ -10,10 +10,6 @@ import {
 export class CreateWhoowDto {
   @IsNotEmpty()
   @IsString()
-  brandId: string; // Assuming ObjectId as a string
-
-  @IsNotEmpty()
-  @IsString()
   description: string;
 
   @IsOptional()
@@ -32,6 +28,12 @@ export class CreateWhoowDto {
 
   @IsOptional()
   GiftCardImage: string;
+
+  @IsOptional()
+  previewImage: string;
+
+  @IsOptional()
+  brandName: string;
 
   @IsNotEmpty()
   data: any; // Adjust based on specific structure, if possible

@@ -33,6 +33,7 @@ import {
   GiftCardErrors,
   GiftCardErrorsDocument,
 } from 'src/schemas/payment/errorcards.schema';
+import { retry } from 'rxjs';
 
 @Injectable()
 export class VouchagramService {
@@ -273,10 +274,12 @@ export class VouchagramService {
       paymentId: string;
     },
     tryAgain: boolean = false,
+    refund?: Function,
   ) {
     const isErrorExist = await this.giftCardErrorsModel.findOne({
       paymentID: data.paymentId,
     });
+
     try {
       const token = await this.getToken(true);
       const payload = this.encrypt(data);
@@ -293,6 +296,8 @@ export class VouchagramService {
             },
           },
         );
+      console.log(res.data);
+
       if (res.data.code !== '0000') {
         if (!isErrorExist) {
           await this.giftCardErrorsModel.create({
@@ -305,15 +310,17 @@ export class VouchagramService {
             data,
           });
         } else {
-          await this.giftCardErrorsModel.updateOne({
-            user: data.user.toString(),
-            amount: data.Denomination,
-            paymentID: data.paymentId,
-            provider: 'GIFTER',
+          console.log('-------------UPDATEING...');
+          if (refund && retry) {
+            await refund();
+          }
+          const resd = await isErrorExist.updateOne({
             errorResponse: res.data,
             retry: tryAgain,
+            refund: refund,
             data,
           });
+          console.log(resd);
         }
         return {
           status: false,
@@ -321,6 +328,7 @@ export class VouchagramService {
           data: res.data as any,
         };
       }
+      console.log('--------------PASS');
 
       const pullData: VouchagramResponse = JSON.parse(
         this.decrypt(res.data.data),
@@ -346,15 +354,17 @@ export class VouchagramService {
           data,
         });
       } else {
-        await this.giftCardErrorsModel.updateOne({
-          user: data.user.toString(),
-          amount: data.Denomination,
-          paymentID: data.paymentId,
-          provider: 'GIFTER',
-          errorResponse: error?.response?.data,
-          retry: tryAgain,
-          data,
-        });
+        if (refund && retry) {
+          await refund();
+        }
+        await this.giftCardErrorsModel.updateOne(
+          { _id: isErrorExist._id },
+          {
+            errorResponse: error?.response?.data,
+            retry: tryAgain,
+            data,
+          },
+        );
       }
       throw error;
     }

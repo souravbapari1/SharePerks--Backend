@@ -14,6 +14,12 @@ export class GiftCardErrors {
   @Prop({ default: false })
   retry: boolean;
 
+  @Prop({ default: false })
+  refund: boolean;
+
+  @Prop()
+  refundNote: string;
+
   @Prop()
   paymentID: string;
 

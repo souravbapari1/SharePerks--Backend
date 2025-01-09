@@ -54,8 +54,4 @@ export class UpdateBrandDto {
   @IsString()
   @IsOptional()
   brandImage?: string;
-
-  @IsString()
-  @IsOptional()
-  discountHighLights?: string;
 }

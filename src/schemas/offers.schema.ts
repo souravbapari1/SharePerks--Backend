@@ -48,7 +48,7 @@ export class Offers {
   category: mongoose.Schema.Types.ObjectId;
 
   @Prop()
-  offerKeyPoints: string[];
+  offerKeyPoints: string;
 
   @Prop()
   offerTitle: string;

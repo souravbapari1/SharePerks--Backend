@@ -125,46 +125,19 @@ export class GiftcardService {
     if (!task) {
       throw new NotFoundException('Sorry Gift Card Not Found');
     }
-    const brand = await this.brandModel.findById(task.brandId).lean();
 
     return {
       ...task,
-      brand,
     };
   }
 
   async getAllGiftCard() {
-    const task = await this.giftCardModel.aggregate([
-      {
-        $lookup: {
-          from: 'brands',
-          localField: 'brandId',
-          foreignField: '_id',
-          as: 'brand',
-        },
-      },
-      {
-        $unwind: '$brand',
-      },
-    ]);
+    const task = await this.giftCardModel.find();
     return task;
   }
 
   async getActiveGiftCard() {
-    const task = await this.giftCardModel.aggregate([
-      { $match: { isEnable: true } },
-      {
-        $lookup: {
-          from: 'brands',
-          localField: 'brandId',
-          foreignField: '_id',
-          as: 'brand',
-        },
-      },
-      {
-        $unwind: '$brand',
-      },
-    ]);
+    const task = await this.giftCardModel.find({ isEnable: true });
     return task;
   }
 

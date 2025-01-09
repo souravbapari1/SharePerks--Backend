@@ -5,6 +5,7 @@ import { CommitionService } from './commition/commition.service';
 import { CuelinksService } from './cuelinks/cuelinks.service';
 import { VouchagramService } from './vouchagram/vouchagram.service';
 import { WhoowApiService } from './whoow/whoow.service';
+import { GiftcardorderService } from 'src/core/giftcardorder/giftcardorder.service';
 
 @Injectable()
 export class TaskService {
@@ -14,6 +15,7 @@ export class TaskService {
     private readonly amitedService: AdmitadService,
     private readonly commitionService: CommitionService,
     private readonly whoowApiService: WhoowApiService,
+    private readonly giftCardOrders: GiftcardorderService,
   ) {}
   private log = new Logger();
   @Cron(CronExpression.EVERY_12_HOURS)
@@ -57,11 +59,21 @@ export class TaskService {
     }
   }
 
-  @Cron(CronExpression.EVERY_10_MINUTES)
+  @Cron(CronExpression.EVERY_30_SECONDS)
   async reverifyFailedCoupones() {
     try {
-      await this.vouchagramService.retryFailedCoupons();
-      this.log.log('@CRON - ReTry vouchagramService erros');
+      await this.giftCardOrders.retryAllGifter();
+      this.log.log('@CRON - ReTry Gifter errors');
+    } catch (error) {
+      console.log(error.message || error);
+    }
+  }
+
+  @Cron(CronExpression.EVERY_30_SECONDS)
+  async reverifyFailedWhoowCoupones() {
+    try {
+      await this.giftCardOrders.retryAllWhoowErrors();
+      this.log.log('@CRON - ReTry Whoow errors');
     } catch (error) {
       console.log(error.message || error);
     }
@@ -97,7 +109,7 @@ export class TaskService {
     }
   }
 
-  // @Cron(CronExpression.EVERY_10_SECONDS)
+  // @Cron(CronExpression.EVERY_30_SECONDS)
   // async WhoowConfig() {
   //   try {
   //     const res = await this.vouchagramService.pullVouchers({
@@ -114,7 +126,7 @@ export class TaskService {
   //   }
   // }
 
-  // @Cron(CronExpression.EVERY_10_SECONDS)
+  // @Cron(CronExpression.EVERY_30_SECONDS)
   // async WhoowConfig() {
   //   try {
   //     const user: any = { name: 'Testing' };

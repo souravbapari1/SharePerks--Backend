@@ -1,8 +1,6 @@
-import { WhoowService } from './../whoow/whoow.service';
 import {
   BadRequestException,
   Injectable,
-  InternalServerErrorException,
   NotAcceptableException,
   NotFoundException,
   NotImplementedException,
@@ -18,23 +16,26 @@ import {
   GiftCardErrorsDocument,
 } from 'src/schemas/payment/errorcards.schema';
 
+import {
+  OrderStatsusRes,
+  WhoowApiService,
+} from 'src/processer/task/whoow/whoow.service';
+import {
+  GiftCardPayments,
+  GiftCardPaymentsDocument,
+} from 'src/schemas/payment/paymentorders.schema';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import {
   VouchagramBrands,
   VouchagramBrandsDocument,
 } from 'src/schemas/vouchagram/vouchagramBrnds.schema';
+import { WhooCard, WhoohCardDocument } from 'src/schemas/whoohcards.schema';
 import {
   MyGiftCards,
   MyGiftCardsDocument,
 } from '../../schemas/payment/cards.schema';
 import { CreateGifterDto } from './dto/CreateGifter.dto';
-import {
-  GiftCardPayments,
-  GiftCardPaymentsDocument,
-} from 'src/schemas/payment/paymentorders.schema';
-import { WhooCard, WhoohCardDocument } from 'src/schemas/whoohcards.schema';
-import { WhoowApiService } from 'src/processer/task/whoow/whoow.service';
-import { dataTagSymbol } from '@tanstack/react-query';
+import { NotificationService } from 'src/global/notification/notification.service';
 
 @Injectable()
 export class GiftcardorderService {
@@ -64,6 +65,7 @@ export class GiftcardorderService {
     private readonly logService: LogService,
     private readonly cashFreeService: CashFreeService,
     private readonly whoowApiService: WhoowApiService,
+    private readonly notificationApiService: NotificationService,
   ) {}
 
   async createGifter(createGiftcardorderDto: CreateGifterDto) {
@@ -124,7 +126,11 @@ export class GiftcardorderService {
     return await this.giftCardPaymentsModel.findById(payment._id);
   }
   // On Retry Just Recall This Function Its Works FOrt GIFTRER ONLY
-  async completeGifterOrder(paymentID: string, tryAgain?: false) {
+  async completeGifterOrder(
+    paymentID: string,
+    tryAgain: boolean = false,
+    refund?: any,
+  ) {
     const payment = await this.giftCardPaymentsModel.findById({
       _id: paymentID,
     });
@@ -158,6 +164,7 @@ export class GiftcardorderService {
         paymentId: paymentID,
       },
       tryAgain,
+      refund,
     );
 
     if (!status) {
@@ -195,8 +202,34 @@ export class GiftcardorderService {
     const voucherDataRes = await this.myGiftCardsModel.findById({
       _id: resData._id,
     });
-
+    await this.notificationApiService.sendNotificationQuickUser({
+      id: voucherDataRes.user,
+      title: 'Thank you.',
+      message: 'Your GiftCard is Successfully Generated',
+    });
     return voucherDataRes;
+  }
+
+  async retryAllGifter() {
+    const res = await this.giftCardErrorsModel.find({
+      retry: false,
+      provider: 'GIFTER',
+      refund: false,
+    });
+
+    res.forEach(async (errorCheck) => {
+      try {
+        await this.completeGifterOrder(
+          errorCheck.paymentID.toString(),
+          true,
+          this.refundPayment(errorCheck.paymentID),
+        );
+      } catch (error) {
+        console.log(error?.response?.data);
+      }
+    });
+
+    return res;
   }
 
   async createWhoow(createGiftcardorderDto: CreateGifterDto) {
@@ -299,6 +332,14 @@ export class GiftcardorderService {
             errorResponse: pullVoucher,
           });
         }
+
+        await this.notificationApiService.sendNotificationQuickUser({
+          id: payment.user,
+          title: `Order Under Processing`,
+          message: 'Your GiftCard is Under Processing',
+        });
+        console.log('Send -1');
+
         return {
           status: false,
           message: 'Your Order is Under Processing',
@@ -319,7 +360,11 @@ export class GiftcardorderService {
           whoowResponse: pullVoucher,
           name: voucherData.productName,
         });
-
+        await this.notificationApiService.sendNotificationQuickUser({
+          id: payment.user,
+          title: 'Thank you.',
+          message: 'Your GiftCard is Successfully Generated',
+        });
         return {
           status: true,
           message: 'Gift Card Create Successfully',
@@ -336,6 +381,12 @@ export class GiftcardorderService {
           provider: 'WHOOW',
           errorResponse: pullVoucher,
         });
+        await this.notificationApiService.sendNotificationQuickUser({
+          id: payment.user,
+          title: `Order Under Processing`,
+          message: 'Your GiftCard is Under Processing',
+        });
+        console.log('Send -2');
       }
       return {
         status: false,
@@ -351,6 +402,11 @@ export class GiftcardorderService {
           provider: 'WHOOW',
           errorResponse: error?.response?.data || 'Unknown Error',
         });
+        await this.notificationApiService.sendNotificationQuickUser({
+          id: payment.user,
+          title: `Order Under Processing`,
+          message: 'Your GiftCard is Under Processing',
+        });
       }
       return {
         status: false,
@@ -359,5 +415,180 @@ export class GiftcardorderService {
         errorResponse: error?.response?.data || 'Unknown Error',
       };
     }
+  }
+
+  private async retryWhoowOrder(errorId: string) {
+    const errorCodes = [
+      400, 5035, 5036, 5037, 5038, 5046, 5305, 5307, 5308, 5310, 5311, 5312,
+      5313, 5315, 5318, 6000, 5320,
+    ];
+
+    const payment = await this.giftCardErrorsModel.findOne({
+      _id: errorId,
+      retry: false,
+      refund: false,
+      provider: 'WHOOW',
+    });
+
+    if (!payment) {
+      throw new Error('Payment Not FOund');
+    }
+    // Check Is Alredy Exist
+    const existCard = await this.myGiftCardsModel.findOne({
+      paymentID: payment.paymentID,
+    });
+
+    if (existCard) {
+      return existCard;
+    }
+
+    let getOrder: OrderStatsusRes;
+    try {
+      getOrder = await this.whoowApiService.getOrderStatus(payment.paymentID);
+    } catch (error) {
+      if (errorCodes.includes(error?.response?.data?.code)) {
+        await this.refundPayment(payment.paymentID, error?.response?.data);
+        return error?.response?.data;
+      }
+      console.log(error?.response?.data);
+
+      throw new Error('Order Status Not Found');
+    }
+    console.log(getOrder.status);
+
+    const paymentData = await this.giftCardPaymentsModel.findOneAndUpdate(
+      { _id: payment.paymentID },
+      {
+        status: getOrder.status,
+      },
+    );
+
+    // ,"CANCELED",""
+    const pendingState = ['PENDING', 'PROCESSING'];
+
+    if (pendingState.includes(getOrder.status)) {
+      await payment.updateOne({
+        errorResponse: getOrder,
+      });
+      // await this.notificationApiService.sendNotificationQuickUser({
+      //   id: payment.user,
+      //   title: `Order Under Processing`,
+      //   message: 'Your GiftCard is Under Processing',
+      // });
+      return getOrder;
+    }
+
+    if (getOrder.status == 'COMPLETE') {
+      let getOrderData = await this.whoowApiService.getActiveOrders(
+        getOrder.orderId,
+      );
+
+      // return getOrderData;
+      const card = await this.myGiftCardsModel.create({
+        user: payment.user,
+        amount: payment.amount,
+        provider: 'WHOOW',
+        paymentID: payment.paymentID,
+        name: getOrderData.cards[0].productName,
+        code: getOrderData.cards[0].cardNumber,
+        pin: getOrderData.cards[0].cardPin,
+        expiredDate: getOrderData.cards[0].validity,
+        whoowResponse: getOrderData,
+      });
+      await payment.deleteOne();
+      await paymentData.updateOne({
+        status: 'COMPLETE',
+      });
+      await this.notificationApiService.sendNotificationQuickUser({
+        id: payment.user,
+        title: 'Thank you.',
+        message: 'Your GiftCard is Successfully Generated',
+      });
+      return card;
+    }
+
+    // not any other state Ex Cancel
+    await payment.updateOne({
+      retry: true,
+      errorResponse: getOrder,
+    });
+    await this.refundPayment(payment.paymentID, getOrder);
+    return getOrder;
+  }
+
+  private async refundPayment(payId: string, error?: any) {
+    try {
+      const paymentData = await this.giftCardPaymentsModel.findOne({
+        _id: payId,
+      });
+      const payRes = await this.cashFreeService.refund(payId, {
+        refund_amount: paymentData.amount,
+        refund_id: payId,
+        refund_note: 'Refund For Order Not Found',
+        refund_speed: 'STANDARD',
+      });
+      await this.giftCardErrorsModel.updateOne(
+        { paymentID: payId },
+        {
+          retry: true,
+          refund: true,
+          refundNote: 'Refund For Order Not Found',
+          errorResponse: error,
+        },
+      );
+      await paymentData.updateOne({
+        status: 'REFUND',
+      });
+      await this.notificationApiService.sendNotificationQuickUser({
+        id: paymentData.user,
+        title: `GiftCard Generate Failed`,
+        message: 'Your GiftCard is Failed. Payment Refund Successfully',
+      });
+      return payRes;
+    } catch (error) {
+      throw new NotAcceptableException('Error ON Refund');
+    }
+  }
+
+  async retryAllWhoowErrors() {
+    const res = await this.giftCardErrorsModel.find({
+      retry: false,
+      provider: 'WHOOW',
+      refund: false,
+    });
+
+    res.forEach(async (errorCheck) => {
+      try {
+        await this.retryWhoowOrder(errorCheck._id.toString());
+      } catch (error) {
+        console.log(error?.response?.data);
+      }
+    });
+
+    return res;
+  }
+
+  // here get My Cards
+  async getMyCards(userId: string) {
+    const cards = await this.myGiftCardsModel.find({
+      user: userId,
+    });
+
+    const pending = await this.giftCardErrorsModel.find({
+      retry: false,
+      refund: false,
+      user: userId,
+    });
+
+    const failed = await this.giftCardErrorsModel.find({
+      retry: true,
+      user: userId,
+    });
+
+    return {
+      cards,
+      pending,
+      failed,
+    };
   }
 }

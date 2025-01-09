@@ -1,4 +1,4 @@
-import { Body, Controller, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post } from '@nestjs/common';
 
 import { CreateGifterDto } from './dto/CreateGifter.dto';
 import { GiftcardorderService } from './giftcardorder.service';
@@ -12,7 +12,7 @@ export class GiftcardorderController {
     return this.giftcardorderService.createGifter(createGiftcardorderDto);
   }
 
-  @Post('verify/gifter/:orderId')
+  @Get('verify/gifter/:orderId')
   async createGifter(@Param('orderId') orderId: string) {
     return await this.giftcardorderService.completeGifterOrder(orderId);
   }
@@ -22,8 +22,23 @@ export class GiftcardorderController {
     return await this.giftcardorderService.createWhoow(createGiftcardorderDto);
   }
 
-  @Post('verify/whoow/:orderId')
+  @Get('verify/whoow/:orderId')
   async createWhoow(@Param('orderId') orderId: string) {
     return await this.giftcardorderService.completeWhoowOrder(orderId);
+  }
+
+  @Get('order/:orderId')
+  async getWhoowOrder(@Param('orderId') orderId: string) {
+    return await this.giftcardorderService.retryAllWhoowErrors();
+  }
+
+  @Get('/gifter/:orderId')
+  async getGifterOrder(@Param('orderId') orderId: string) {
+    return await this.giftcardorderService.completeGifterOrder(orderId, true);
+  }
+
+  @Get('/cards/:user')
+  async getGifterOrderUser(@Param('user') user: string) {
+    return await this.giftcardorderService.getMyCards(user);
   }
 }

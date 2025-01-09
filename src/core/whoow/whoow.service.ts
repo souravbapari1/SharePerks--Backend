@@ -44,11 +44,6 @@ export class WhoowService {
   ) {}
 
   async create(createWhoowDto: CreateWhoowDto, file: Express.Multer.File) {
-    const brand = await this.brandModel.findById(createWhoowDto.brandId);
-    if (!brand) {
-      throw new NotFoundException('Brand Not Found');
-    }
-
     const res = await this.whoowModel.create({
       ...createWhoowDto,
       GiftCardImage: file.path,
@@ -106,9 +101,8 @@ export class WhoowService {
 
   async findOne(id: string) {
     let card = await this.whoowModel.findById(id).lean();
-    let brand = await this.brandModel.findById(card.brandId);
 
-    return { ...card, brand };
+    return { ...card };
   }
 
   async update(
@@ -116,12 +110,6 @@ export class WhoowService {
     updateWhoowDto: UpdateWhoowDto,
     file?: Express.Multer.File,
   ) {
-    if (updateWhoowDto.brandId) {
-      const brand = await this.brandModel.findById(updateWhoowDto.brandId);
-      if (!brand) {
-        throw new NotFoundException('Brand Not Found');
-      }
-    }
     let data = updateWhoowDto;
 
     if (file) {
