@@ -59,7 +59,7 @@ export class TaskService {
     }
   }
 
-  @Cron(CronExpression.EVERY_30_SECONDS)
+  @Cron(CronExpression.EVERY_MINUTE)
   async reverifyFailedCoupones() {
     try {
       await this.giftCardOrders.retryAllGifter();
@@ -69,7 +69,7 @@ export class TaskService {
     }
   }
 
-  @Cron(CronExpression.EVERY_30_SECONDS)
+  @Cron(CronExpression.EVERY_MINUTE)
   async reverifyFailedWhoowCoupones() {
     try {
       await this.giftCardOrders.retryAllWhoowErrors();
@@ -99,10 +99,10 @@ export class TaskService {
     }
   }
 
-  @Cron(CronExpression.EVERY_WEEK)
+  @Cron(CronExpression.EVERY_1ST_DAY_OF_MONTH_AT_MIDNIGHT)
   async handleWhoowCategory() {
     try {
-      await this.whoowApiService.getCategories();
+      await this.whoowApiService.getCategoriesAndProducts();
       this.log.log('@CRON - Update Whoow get All data on Products ');
     } catch (error) {
       console.log(error.message || error);

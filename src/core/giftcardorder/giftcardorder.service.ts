@@ -233,6 +233,7 @@ export class GiftcardorderService {
   }
 
   async createWhoow(createGiftcardorderDto: CreateGifterDto) {
+    const orderID = this.genrateOrderId();
     const product = await this.whoowModel.findOne({
       'data.sku': createGiftcardorderDto.brandProductCode,
     });
@@ -255,6 +256,7 @@ export class GiftcardorderService {
       item: 'WHOOW',
       data: createGiftcardorderDto,
       metaData: product,
+      orderID,
     });
 
     const session = await this.cashFreeService.createSession({
@@ -316,7 +318,7 @@ export class GiftcardorderService {
     try {
       const pullVoucher = await this.whoowApiService.createOrder({
         amount: payment.data.denomination,
-        id: payment._id.toString(),
+        id: payment.orderID.toString(),
         sku: payment.data.brandProductCode,
         user: userData,
         upi: 'test@pnb',
@@ -330,6 +332,7 @@ export class GiftcardorderService {
             paymentID: payment._id,
             provider: 'WHOOW',
             errorResponse: pullVoucher,
+            orderID: payment.orderID,
           });
         }
 
@@ -359,6 +362,7 @@ export class GiftcardorderService {
           expiredDate: voucherData.validity,
           whoowResponse: pullVoucher,
           name: voucherData.productName,
+          orderID: payment.orderID,
         });
         await this.notificationApiService.sendNotificationQuickUser({
           id: payment.user,
@@ -380,6 +384,7 @@ export class GiftcardorderService {
           paymentID: payment._id,
           provider: 'WHOOW',
           errorResponse: pullVoucher,
+          orderID: payment.orderID,
         });
         await this.notificationApiService.sendNotificationQuickUser({
           id: payment.user,
@@ -401,6 +406,7 @@ export class GiftcardorderService {
           paymentID: payment._id,
           provider: 'WHOOW',
           errorResponse: error?.response?.data || 'Unknown Error',
+          orderID: payment.orderID,
         });
         await this.notificationApiService.sendNotificationQuickUser({
           id: payment.user,
@@ -444,7 +450,7 @@ export class GiftcardorderService {
 
     let getOrder: OrderStatsusRes;
     try {
-      getOrder = await this.whoowApiService.getOrderStatus(payment.paymentID);
+      getOrder = await this.whoowApiService.getOrderStatus(payment.orderID);
     } catch (error) {
       if (errorCodes.includes(error?.response?.data?.code)) {
         await this.refundPayment(payment.paymentID, error?.response?.data);
@@ -470,11 +476,8 @@ export class GiftcardorderService {
       await payment.updateOne({
         errorResponse: getOrder,
       });
-      // await this.notificationApiService.sendNotificationQuickUser({
-      //   id: payment.user,
-      //   title: `Order Under Processing`,
-      //   message: 'Your GiftCard is Under Processing',
-      // });
+
+      await this.refundPayment(payment.paymentID, getOrder);
       return getOrder;
     }
 
@@ -494,6 +497,7 @@ export class GiftcardorderService {
         pin: getOrderData.cards[0].cardPin,
         expiredDate: getOrderData.cards[0].validity,
         whoowResponse: getOrderData,
+        orderID: payment.orderID,
       });
       await payment.deleteOne();
       await paymentData.updateOne({
@@ -570,9 +574,13 @@ export class GiftcardorderService {
 
   // here get My Cards
   async getMyCards(userId: string) {
-    const cards = await this.myGiftCardsModel.find({
-      user: userId,
-    });
+    const cards = await this.myGiftCardsModel
+      .find({
+        user: userId,
+      })
+      .sort({
+        createdAt: -1,
+      });
 
     const pending = await this.giftCardErrorsModel.find({
       retry: false,
@@ -590,5 +598,11 @@ export class GiftcardorderService {
       pending,
       failed,
     };
+  }
+
+  private genrateOrderId() {
+    const data = Date.now();
+    const prefix = 'SHRP_' + data;
+    return prefix;
   }
 }

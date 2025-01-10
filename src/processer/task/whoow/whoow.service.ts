@@ -23,7 +23,7 @@ export class WhoowApiService {
     this.date = new Date();
   }
 
-  async getCategories(): Promise<any> {
+  async getCategoriesAndProducts(): Promise<any> {
     try {
       const token = await this.newTokenRequest();
       console.log(token);

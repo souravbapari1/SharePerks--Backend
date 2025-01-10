@@ -21,6 +21,9 @@ export class GiftCardErrors {
   refundNote: string;
 
   @Prop()
+  orderID: string;
+
+  @Prop()
   paymentID: string;
 
   @Prop()

@@ -20,6 +20,9 @@ export class GiftCardPayments {
   @Prop()
   item: string;
 
+  @Prop()
+  orderID: string;
+
   @Prop({ type: mongoose.Schema.Types.Mixed })
   data: any;
 

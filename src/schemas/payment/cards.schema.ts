@@ -27,6 +27,9 @@ export class MyGiftCards {
   pin: string;
 
   @Prop()
+  orderID: string;
+
+  @Prop()
   expiredDate: string;
 
   @Prop({ type: mongoose.Schema.Types.Mixed })
