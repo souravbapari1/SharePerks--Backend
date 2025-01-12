@@ -470,14 +470,20 @@ export class GiftcardorderService {
     );
 
     // ,"CANCELED",""
+
+    if (payment.retryCount == 3) {
+      await this.refundPayment(payment.paymentID, getOrder);
+      return getOrder;
+    }
     const pendingState = ['PENDING', 'PROCESSING'];
 
     if (pendingState.includes(getOrder.status)) {
       await payment.updateOne({
         errorResponse: getOrder,
+        retryCount: payment.retryCount + 1,
       });
 
-      await this.refundPayment(payment.paymentID, getOrder);
+      // await this.refundPayment(payment.paymentID, getOrder);
       return getOrder;
     }
 

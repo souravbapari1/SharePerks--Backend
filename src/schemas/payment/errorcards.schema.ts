@@ -26,6 +26,9 @@ export class GiftCardErrors {
   @Prop()
   paymentID: string;
 
+  @Prop({ default: 0 })
+  retryCount: number;
+
   @Prop()
   provider: 'WHOOW' | 'GIFTER';
 
