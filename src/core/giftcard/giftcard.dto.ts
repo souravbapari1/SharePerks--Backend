@@ -29,7 +29,10 @@ export class CreateGiftCardDto {
 
   @IsNotEmpty()
   @IsString()
-  brandId: string;
+  previewImage: string;
+
+  @IsString()
+  brandName: string;
 
   @IsNotEmpty()
   denominationList: any;

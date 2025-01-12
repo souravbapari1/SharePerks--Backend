@@ -49,8 +49,4 @@ export class CreateBrandDto {
   @IsString()
   @IsOptional()
   brandImage?: string;
-
-  @IsString()
-  @IsNotEmpty()
-  discountHighLights: string;
 }

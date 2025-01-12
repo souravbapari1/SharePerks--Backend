@@ -56,12 +56,6 @@ export class BrandController {
     // Parse JSON fields from body
     console.log(body.offerTerms);
 
-    if (typeof body.offerTerms === 'string') {
-      body.offerTerms = JSON.parse(body.offerTerms);
-    }
-    if (typeof body.cashBackRates === 'string') {
-      body.cashBackRates = JSON.parse(body.cashBackRates);
-    }
     if (typeof body.isActive === 'string') {
       body.isActive = JSON.parse(body.isActive);
     }
@@ -100,12 +94,7 @@ export class BrandController {
     @Body() body: UpdateBrandDto,
   ) {
     // Parse JSON fields from body
-    if (typeof body.offerTerms === 'string') {
-      body.offerTerms = JSON.parse(body.offerTerms);
-    }
-    if (typeof body.cashBackRates === 'string') {
-      body.cashBackRates = JSON.parse(body.cashBackRates);
-    }
+
     if (typeof body.isActive === 'string') {
       body.isActive = JSON.parse(body.isActive);
     }

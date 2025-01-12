@@ -57,8 +57,22 @@ export class UserService {
     };
   }
 
-  async updateUser(user: UserDto, updateData: UserDto) {
+  async updateUser(
+    user: UserDto,
+    updateData: UserDto,
+    image?: Express.Multer.File,
+  ) {
     await this.UserModel.updateOne({ _id: user._id }, updateData);
+    if (image) {
+      await this.UserModel.updateOne(
+        { _id: user._id },
+        {
+          image: image.path,
+        },
+      );
+    }
+    console.log(image);
+
     const userData = await this.getUser(user);
     return {
       message: 'user Update Successfully',

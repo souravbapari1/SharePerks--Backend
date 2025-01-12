@@ -89,9 +89,6 @@ export class OffersController {
       body.isEnable = JSON.parse(body.isEnable);
     if (typeof body.isInSlide === 'string')
       body.isInSlide = JSON.parse(body.isInSlide);
-    if (typeof body.offerKeyPoints === 'string')
-      body.offerKeyPoints = JSON.parse(body.offerKeyPoints);
-
     if (!files.bannerImage) {
       throw new NotAcceptableException('Please Add Banner image File');
     }
@@ -135,8 +132,6 @@ export class OffersController {
       body.isEnable = JSON.parse(body.isEnable);
     if (typeof body.isInSlide === 'string')
       body.isInSlide = JSON.parse(body.isInSlide);
-    if (typeof body.offerKeyPoints === 'string')
-      body.offerKeyPoints = JSON.parse(body.offerKeyPoints);
 
     return await this.offerService.updateOffer(body, id, files);
   }

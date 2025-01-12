@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import * as fs from 'fs';
 import { WhoowProducts } from './whoow';
 import { User } from 'src/schemas/user.schema';
+import { WhoowActiveOrder, WhoowFullOrder } from './whoow-full-order';
 
 @Injectable()
 export class WhoowApiService {
@@ -22,7 +23,7 @@ export class WhoowApiService {
     this.date = new Date();
   }
 
-  async getCategories(): Promise<any> {
+  async getCategoriesAndProducts(): Promise<any> {
     try {
       const token = await this.newTokenRequest();
       console.log(token);
@@ -158,7 +159,7 @@ export class WhoowApiService {
           postcode: '560076',
           billToThis: true,
         },
-        isConsolidated: false,
+        // isConsolidated: true,
         payments: [
           {
             code: 'svc',
@@ -168,6 +169,8 @@ export class WhoowApiService {
         ],
         refno: id,
         syncOnly: true,
+        orderMode: 'SELF',
+        deliveryMode: 'API',
         products: [
           {
             sku: sku,
@@ -198,7 +201,7 @@ export class WhoowApiService {
   async getActiveOrders(id: string) {
     const token = await this.newTokenRequest();
     try {
-      const data = await this.httpService.axiosRef.get(
+      const data = await this.httpService.axiosRef.get<WhoowActiveOrder>(
         `${this.host}/rest/v3/order/${id}/cards/?offset=0&limit=4`,
         {
           headers: {
@@ -208,16 +211,17 @@ export class WhoowApiService {
           },
         },
       );
-      console.log(JSON.stringify(data.data, null, 2));
+
+      return data.data;
     } catch (error: any) {
-      console.log(error?.response?.data);
+      throw error;
     }
   }
 
   async getOrder(id: string) {
     const token = await this.newTokenRequest();
     try {
-      const data = await this.httpService.axiosRef.get(
+      const data = await this.httpService.axiosRef.get<WhoowFullOrder>(
         `${this.host}/rest/v3/orders/${id}`,
         {
           headers: {
@@ -233,4 +237,40 @@ export class WhoowApiService {
       console.log(error?.response?.data);
     }
   }
+
+  async getOrderStatus(id: string) {
+    const token = await this.newTokenRequest();
+    try {
+      const data = await this.httpService.axiosRef.get<OrderStatsusRes>(
+        `${this.host}/rest/v3/order/${id}/status`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+            dateAtClient: this.date.toISOString(),
+          },
+        },
+      );
+      console.log(JSON.stringify(data.data, null, 2));
+      return data.data;
+    } catch (error: any) {
+      console.log(error?.response?.data);
+      throw error;
+    }
+  }
+}
+
+export interface OrderStatsusRes {
+  status: string;
+  statusLabel: string;
+  statusImage: any;
+  statusLevel: any;
+  orderId: string;
+  refno: string;
+  cancel: Cancel;
+}
+
+export interface Cancel {
+  allowed: boolean;
+  allowedWithIn: number;
 }

@@ -9,10 +9,11 @@ import {
 
 @Injectable()
 export class NotificationService {
-  private host = 'http://194.238.19.82:1122';
+  private host = 'https://worker.shareperks.in';
   private access_key = '1236789';
-  private authentication = 'MTQyNTQ4ZDItZWJmOC00YmY0LTk5YmQtOGU1Mjk2MTY3Njg0';
-  private app_id = 'd5d4d67a-353e-46c4-ae9e-95864beea39d';
+  private authentication =
+    'os_v2_app_czqloyzk2reezaun6xbwdkrxnlzau6yat2bec555vhk3clc4vq5i7ud7n247l7rri7r34vv43u7xlzdmbsrdl3rwftwxfbtr5d3dvsi';
+  private app_id = '1660b763-2ad4-484c-828d-f5c361aa376a';
   constructor(
     private readonly httpService: HttpService,
     @InjectModel(Notification.name)

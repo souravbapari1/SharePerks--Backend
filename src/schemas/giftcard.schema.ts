@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import mongoose, { Document, Mongoose } from 'mongoose';
+import { Document } from 'mongoose';
 
 export type GiftCardDocument = GiftCard & Document;
 
@@ -30,9 +30,6 @@ export class GiftCard {
   codeType: string;
 
   @Prop()
-  brandId: mongoose.Schema.Types.ObjectId;
-
-  @Prop()
   denominationList: string;
 
   @Prop({ default: false })
@@ -52,6 +49,12 @@ export class GiftCard {
 
   @Prop()
   GiftCardImage: string;
+
+  @Prop()
+  previewImage: string;
+
+  @Prop()
+  brandName: string;
 
   @Prop()
   OnlineRedemptionUrl: string;
