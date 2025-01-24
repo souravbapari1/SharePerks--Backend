@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { HydratedDocument } from 'mongoose';
+import mongoose, { HydratedDocument } from 'mongoose';
 
 export type AdminDocument = HydratedDocument<Admin>;
 
@@ -19,6 +19,9 @@ export class Admin {
 
   @Prop({ default: 'ADMIN' })
   role: string;
+
+  @Prop({ type: mongoose.Schema.Types.Mixed })
+  permissions: any;
 }
 
 export const AdminSchema = SchemaFactory.createForClass(Admin);

@@ -22,4 +22,7 @@ export class CreateAdminDto {
   })
   @IsString()
   password: string;
+
+  @IsString()
+  permissions: string;
 }

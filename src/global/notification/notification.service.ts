@@ -55,4 +55,43 @@ export class NotificationService {
       console.log(error);
     }
   }
+
+  async sendNotification({
+    id,
+    message,
+    title,
+    image,
+  }: {
+    id: string;
+    message: string;
+    title: string;
+    image?: string;
+  }) {
+    try {
+      const task = await this.httpService.axiosRef.post(
+        `${this.host}/onesignal/push/`,
+        {
+          app_id: this.app_id,
+          title: title,
+          desc: message,
+          image: image,
+        },
+        {
+          headers: {
+            Authorization: `${this.authentication}`,
+            'Content-Type': 'application/json',
+            'access-key': this.access_key,
+          },
+        },
+      );
+      await this.notificationModel.create({
+        user: id,
+        title,
+        message,
+      });
+      return task.data;
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }

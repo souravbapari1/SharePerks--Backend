@@ -59,7 +59,7 @@ export class TaskService {
     }
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_12_HOURS)
   async reverifyFailedCoupones() {
     try {
       await this.giftCardOrders.retryAllGifter();
@@ -69,7 +69,7 @@ export class TaskService {
     }
   }
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_12_HOURS)
   async reverifyFailedWhoowCoupones() {
     try {
       await this.giftCardOrders.retryAllWhoowErrors();
