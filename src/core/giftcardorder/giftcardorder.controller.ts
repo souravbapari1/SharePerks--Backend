@@ -41,4 +41,9 @@ export class GiftcardorderController {
   async getGifterOrderUser(@Param('user') user: string) {
     return await this.giftcardorderService.getMyCards(user);
   }
+
+  @Get('/errors')
+  async getErrors() {
+    return await this.giftcardorderService.getErrors();
+  }
 }

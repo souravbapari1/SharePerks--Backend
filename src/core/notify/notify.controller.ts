@@ -1,15 +1,14 @@
 import {
   Body,
   Controller,
-  Get,
   Post,
   UploadedFile,
   UseInterceptors,
 } from '@nestjs/common';
-import { NotifyService } from './notify.service';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createFileFilter } from 'src/pipes/file-validate/file-validate.pipe';
 import { storage } from 'src/config/storage.config';
+import { createFileFilter } from 'src/pipes/file-validate/file-validate.pipe';
+import { NotifyService } from './notify.service';
 
 @Controller('notify')
 export class NotifyController {

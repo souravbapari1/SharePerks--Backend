@@ -232,6 +232,12 @@ export class GiftcardorderService {
     return res;
   }
 
+  public async getErrors() {
+    return await this.giftCardErrorsModel.find({
+      retry: true,
+    });
+  }
+
   async createWhoow(createGiftcardorderDto: CreateGifterDto) {
     const orderID = this.genrateOrderId();
     const product = await this.whoowModel.findOne({
