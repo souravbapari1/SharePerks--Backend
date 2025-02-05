@@ -189,7 +189,7 @@ export class OffersService {
     };
   }
 
-  async getOffersActive() {
+  async getOffersActive():Promise<any> {
     const task = await this.offersModel.find({ isEnable: true }).lean();
     return task.filter((e) => !this.isExpired(e.expDate.toISOString()))
       .map((e) => ({ ...e, isExpired: false }));
