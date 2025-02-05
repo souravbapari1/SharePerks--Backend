@@ -159,6 +159,43 @@ export class UserService {
     return data;
   }
 
+  async getPaginationUsers(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const data = await this.UserModel.find({}, { expOtp: 0, otp: 0 })
+      .skip(skip)
+      .limit(limit)
+      .lean();
+
+    const total = await this.UserModel.countDocuments();
+
+    return {
+      users: data,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalUsers: total,
+    };
+  }
+
+  async searchUsers(search: string) {
+    const data = await this.UserModel.find({
+      $or: [
+        { name: new RegExp(search, 'i') },
+        { email: new RegExp(search, 'i') },
+        {
+          $expr: {
+            $regexMatch: {
+              input: { $toString: '$mobile' },
+              regex: search,
+              options: 'i',
+            },
+          },
+        },
+      ],
+    }).lean();
+    return data;
+  }
+
   async getFullUser(id: string) {
     if (!isValidObjectId(id)) {
       throw new NotAcceptableException('Invalid User ID');

@@ -158,6 +158,44 @@ export class BrandService {
     return brands;
   }
 
+  async getBrandsPagination(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const brands = await this.brandModel.aggregate([
+      {
+        $addFields: {
+          category: {
+            $map: {
+              input: '$category',
+              as: 'catId',
+              in: { $toObjectId: '$$catId' },
+            },
+          },
+        },
+      },
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'categoryData',
+        },
+      },
+      { $sort: { _id: -1 } }, // Sorting by newest brands first
+      { $skip: skip }, // Skipping records for pagination
+      { $limit: limit }, // Limiting the number of records per page
+    ]);
+
+    const total = await this.brandModel.countDocuments();
+
+    return {
+      brands,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalBrands: total,
+    };
+  }
+
   async getActiveBrands() {
     const brands = await this.brandModel.find({ isActive: true });
     return brands;

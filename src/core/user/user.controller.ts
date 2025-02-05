@@ -106,4 +106,19 @@ export class UserController {
   async getFFullUsers(@Param('id') id: string) {
     return await this.userService.getFullUser(id);
   }
+
+  @UseGuards(AdminGuard)
+  @Get('search/:search')
+  async searchUsers(@Param('search') search: string) {
+    return await this.userService.searchUsers(search);
+  }
+
+  @UseGuards(AdminGuard)
+  @Get('pagination/:page/:limit')
+  async getPaginationUsers(
+    @Param('page') page: number,
+    @Param('limit') limit: number,
+  ) {
+    return await this.userService.getPaginationUsers(page, limit);
+  }
 }

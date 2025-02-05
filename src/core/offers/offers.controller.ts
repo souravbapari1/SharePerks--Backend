@@ -100,6 +100,14 @@ export class OffersController {
     return await this.offerService.createNewOffer(body, files);
   }
 
+  @Get('all/:page/:limit')
+  async getOffersPagination(
+    @Param('page') page: string,
+    @Param('limit') limit: string,
+  ) {
+    return await this.offerService.getOffersPagination(+page, +limit);
+  }
+
   @Put(':id')
   @UseGuards(AdminGuard)
   @UseInterceptors(

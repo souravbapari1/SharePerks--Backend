@@ -153,7 +153,43 @@ export class OffersService {
     }));
   }
 
-  async getOffersActive():Promise<any> {
+
+  async getOffersPagination(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const offers = await this.offersModel.aggregate([
+      {
+        $lookup: {
+          from: 'categories',
+          localField: 'category',
+          foreignField: '_id',
+          as: 'categoryData',
+        },
+      },
+      { $unwind: '$categoryData' }, // Unwinds categoryData to make it an object instead of an array
+      { $sort: { _id: -1 } }, // Sorting by newest offers first
+      { $skip: skip }, // Skipping records for pagination
+      { $limit: limit }, // Limiting the number of records per page
+    ]);
+
+    // Count total offers for pagination
+    const total = await this.offersModel.countDocuments();
+
+    // Add `isExpired` field based on `expDate`
+    const offersWithExpiry = offers.map((e) => ({
+      ...e,
+      isExpired: this.isExpired(e.expDate.toISOString()),
+    }));
+
+    return {
+      offers: offersWithExpiry,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalOffers: total,
+    };
+  }
+
+  async getOffersActive() {
     const task = await this.offersModel.find({ isEnable: true }).lean();
     return task.filter((e) => !this.isExpired(e.expDate.toISOString()))
       .map((e) => ({ ...e, isExpired: false }));
