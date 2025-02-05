@@ -40,7 +40,7 @@ export class CouponController {
   }
 
   @Get(':id')
-  async getOffer(@Param('id') id: string) {
+  async getOffer(@Param('id') id: string):Promise<any> {
     return await this.couponService.getCoupon(id);
   }
 

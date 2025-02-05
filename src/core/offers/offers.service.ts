@@ -117,7 +117,7 @@ export class OffersService {
     };
   }
 
-  async getOffer(id: string) {
+  async getOffer(id: string):Promise<any> {
     if (!isValidObjectId(id)) {
       throw new NotAcceptableException('Invalid Offer Object Id');
     }
@@ -153,14 +153,13 @@ export class OffersService {
     }));
   }
 
-  async getOffersActive() {
+  async getOffersActive():Promise<any> {
     const task = await this.offersModel.find({ isEnable: true }).lean();
-    return task
-      .filter((e) => !this.isExpired(e.expDate.toISOString()))
+    return task.filter((e) => !this.isExpired(e.expDate.toISOString()))
       .map((e) => ({ ...e, isExpired: false }));
   }
 
-  async getOffersByCategoryActive(category: string) {
+  async getOffersByCategoryActive(category: string):Promise<any> {
     const task = await this.offersModel
       .find({ isEnable: true, category: category })
       .lean();
@@ -169,7 +168,7 @@ export class OffersService {
       .map((e) => ({ ...e, isExpired: false }));
   }
 
-  async getOffersByBrokerActive(stockISIN: string) {
+  async getOffersByBrokerActive(stockISIN: string):Promise<any> {
     const task = await this.offersModel
       .find({ isEnable: true, stockISIN: stockISIN })
       .lean();
