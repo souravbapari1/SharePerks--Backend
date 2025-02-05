@@ -18,7 +18,8 @@ async function bootstrap() {
   app.enableCors();
 
   // Serve static assets
-  app.useStaticAssets(join(__dirname, '..', 'public'), { prefix: '/public/' });
+  app.useStaticAssets(join(__dirname, '..','..', 'public'), { prefix: '/public/' });
+console.log(join(__dirname, '..','..', 'public'));
 
   // Swagger configuration
   const config = new DocumentBuilder()

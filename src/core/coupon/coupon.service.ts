@@ -117,7 +117,7 @@ export class CouponService {
     };
   }
 
-  async getCoupon(id: string) {
+  async getCoupon(id: string):Promise<any> {
     if (!isValidObjectId(id)) {
       throw new NotAcceptableException('Invalid Coupon Object Id');
     }
@@ -160,7 +160,7 @@ export class CouponService {
     const task = await this.couponModel.find({ isEnable: true }).lean();
     return task
       .filter((e) => !this.isExpired(e.expDate.toISOString()))
-      .map((e) => ({ ...e, isExpired: false }));
+      .map((e) => ({ ...e, isExpired: false })) as any ;
   }
 
   private isExpired(expDate: string): boolean {

@@ -159,9 +159,9 @@ export class AdmitadService {
   }
 
   async storeAllCompanies() {
+    const token = await this.getTokens();
     let page = 0;
     const limit = 500;
-    const token = await this.getTokens();
     let data: {
       cam_id: number;
       data: Result;
