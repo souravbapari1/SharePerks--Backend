@@ -132,6 +132,44 @@ export class PayoutService {
     return task;
   }
 
+  async getPaginationPayouts(page: number = 1, limit: number = 10) {
+    const skip = (page - 1) * limit;
+
+    const payouts = await this.payoutModel.aggregate([
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'userData',
+        },
+      },
+      {
+        $addFields: {
+          userData: { $arrayElemAt: ['$userData', 0] },
+        },
+      },
+      {
+        $project: {
+          'userData.otp': 0,
+          'userData.expOtp': 0,
+        },
+      },
+      { $sort: { _id: -1 } }, // Sort by newest payouts first
+      { $skip: skip }, // Skip records for pagination
+      { $limit: limit }, // Limit number of records
+    ]);
+
+    const total = await this.payoutModel.countDocuments();
+
+    return {
+      payouts,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalPayouts: total,
+    };
+  }
+
   async getPayoutsFilter(status: string) {
     const task = await this.payoutModel.aggregate([
       {
@@ -160,5 +198,53 @@ export class PayoutService {
       },
     ]);
     return task;
+  }
+
+  async getPayoutsFilterPagination(
+    status: string,
+    page: number = 1,
+    limit: number = 10,
+  ) {
+    const skip = (page - 1) * limit;
+
+    const payouts = await this.payoutModel.aggregate([
+      {
+        $match: {
+          status: status, // Match status
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'user',
+          foreignField: '_id',
+          as: 'userData',
+        },
+      },
+      {
+        $addFields: {
+          userData: { $arrayElemAt: ['$userData', 0] }, // Extract first user object
+        },
+      },
+      {
+        $project: {
+          'userData.otp': 0,
+          'userData.expOtp': 0, // Exclude sensitive user data
+        },
+      },
+      { $sort: { _id: -1 } }, // Sort by newest payouts first
+      { $skip: skip }, // Skip records for pagination
+      { $limit: limit }, // Limit number of records per page
+    ]);
+
+    // Count total filtered records for pagination
+    const total = await this.payoutModel.countDocuments({ status });
+
+    return {
+      payouts,
+      currentPage: page,
+      totalPages: Math.ceil(total / limit),
+      totalPayouts: total,
+    };
   }
 }

@@ -123,6 +123,15 @@ export class BrandController {
     return brand;
   }
 
+  @Get('/all/:page/:limit')
+  async getBrandsPagination(
+    @Param('page') page: string,
+    @Param('limit') limit: string,
+  ) {
+    const brands = await this.brandService.getBrandsPagination(+page, +limit);
+    return brands;
+  }
+
   @Get('/search/:name')
   async searchActiveBrand(@Param('name') name: string) {
     const brand = await this.brandService.searchActiveBrandsByName(name);

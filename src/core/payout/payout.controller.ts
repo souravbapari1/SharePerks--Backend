@@ -23,6 +23,15 @@ export class PayoutController {
     return await this.payoutService.getPayouts();
   }
 
+  @UseGuards(AdminGuard)
+  @Get('/all/:page/:limit')
+  async getPagination(
+    @Param('page') page: string,
+    @Param('limit') limit: string,
+  ) {
+    return await this.payoutService.getPaginationPayouts(+page, +limit);
+  }
+
   @UseGuards(AuthUserGuard)
   @Post()
   async newRequest(@Body() body: CreatePayoutDto) {
@@ -44,6 +53,20 @@ export class PayoutController {
   @Get('all/filter/:status')
   async getRequestAllFilter(@Param('status') status: string) {
     return await this.payoutService.getPayoutsFilter(status);
+  }
+
+  @UseGuards(AuthUserGuard)
+  @Get('all/filter/:status/:page/:limit')
+  async getPaginationPagination(
+    @Param('status') status: string,
+    @Param('page') page: string,
+    @Param('limit') limit: string,
+  ) {
+    return await this.payoutService.getPayoutsFilterPagination(
+      status,
+      +page,
+      +limit,
+    );
   }
 
   @UseGuards(AuthUserGuard)
