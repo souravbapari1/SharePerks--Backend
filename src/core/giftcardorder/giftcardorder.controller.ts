@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 
 import { CreateGifterDto } from './dto/CreateGifter.dto';
 import { GiftcardorderService } from './giftcardorder.service';
@@ -43,7 +43,15 @@ export class GiftcardorderController {
   }
 
   @Get('/errors')
-  async getErrors() {
-    return await this.giftcardorderService.getErrors();
+  async getErrors(
+    @Query('search') searchQuery?: string, // Optional search query
+    @Query('page') page: number = 1, // Default page 1
+    @Query('limit') limit: number = 10, // Default limit 10
+  ) {
+    return await this.giftcardorderService.getErrors(
+      searchQuery || '',
+      Number(page),
+      Number(limit),
+    );
   }
 }

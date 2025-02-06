@@ -162,6 +162,7 @@ export class GiftcardorderService {
         ExternalOrderId: paymentID,
         user: payment.user.toString(),
         paymentId: paymentID,
+        payAmount: payment.amount,
       },
       tryAgain,
       refund,
@@ -190,6 +191,7 @@ export class GiftcardorderService {
       expiredDate: voucherData.Vouchers[0].EndDate,
       gifterResponse: pullVoucher,
       name: voucherData.VoucherName,
+      payAmount: payment.amount,
     };
 
     let resData = isGiftCardExist;
@@ -232,10 +234,71 @@ export class GiftcardorderService {
     return res;
   }
 
-  public async getErrors() {
-    return await this.giftCardErrorsModel.find({
-      retry: true,
-    });
+  public async getErrors(
+    searchQuery: string, // Search term
+    page: number = 1, // Current page
+    limit: number = 10, // Number of results per page
+  ) {
+    const skip = (page - 1) * limit; // Calculate the number of documents to skip
+
+    const result = await this.giftCardErrorsModel
+      .aggregate([
+        {
+          $match: { retry: true }, // Filter errors where retry is true
+        },
+        {
+          $addFields: {
+            userObjectId: { $toObjectId: '$user' }, // Convert user (string) to ObjectId
+          },
+        },
+        {
+          $lookup: {
+            from: 'users',
+            localField: 'userObjectId',
+            foreignField: '_id',
+            as: 'userData',
+          },
+        },
+        {
+          $unwind: '$userData',
+        },
+        {
+          $match: {
+            $or: [
+              { 'userData.name': { $regex: searchQuery, $options: 'i' } }, // Case-insensitive name search
+              { 'userData.email': { $regex: searchQuery, $options: 'i' } }, // Case-insensitive email search
+              { 'userData.mobile': { $regex: searchQuery, $options: 'i' } }, // Case-insensitive mobile search
+            ],
+          },
+        },
+        {
+          $sort: { createdAt: -1 }, // Sort by latest created data
+        },
+        {
+          $facet: {
+            metadata: [{ $count: 'total' }], // Count total matching documents
+            data: [{ $skip: skip }, { $limit: limit }], // Apply pagination
+          },
+        },
+        {
+          $addFields: {
+            metadata: {
+              $arrayElemAt: ['$metadata', 0], // Convert metadata array to object
+            },
+          },
+        },
+        {
+          $addFields: {
+            'metadata.totalPages': {
+              $ceil: { $divide: ['$metadata.total', limit] }, // Calculate total pages
+            },
+            'metadata.currentPage': page, // Include current page
+          },
+        },
+      ])
+      .exec();
+
+    return result[0]; // Since aggregate returns an array, return the first object
   }
 
   async createWhoow(createGiftcardorderDto: CreateGifterDto) {
@@ -339,6 +402,7 @@ export class GiftcardorderService {
             provider: 'WHOOW',
             errorResponse: pullVoucher,
             orderID: payment.orderID,
+            payAmount: payment.amount,
           });
         }
 
@@ -369,6 +433,7 @@ export class GiftcardorderService {
           whoowResponse: pullVoucher,
           name: voucherData.productName,
           orderID: payment.orderID,
+          payAmount: payment.amount,
         });
         await this.notificationApiService.sendNotificationQuickUser({
           id: payment.user,
@@ -391,6 +456,7 @@ export class GiftcardorderService {
           provider: 'WHOOW',
           errorResponse: pullVoucher,
           orderID: payment.orderID,
+          payAmount: payment.amount,
         });
         await this.notificationApiService.sendNotificationQuickUser({
           id: payment.user,
@@ -413,6 +479,7 @@ export class GiftcardorderService {
           provider: 'WHOOW',
           errorResponse: error?.response?.data || 'Unknown Error',
           orderID: payment.orderID,
+          payAmount: payment.amount,
         });
         await this.notificationApiService.sendNotificationQuickUser({
           id: payment.user,
@@ -510,6 +577,7 @@ export class GiftcardorderService {
         expiredDate: getOrderData.cards[0].validity,
         whoowResponse: getOrderData,
         orderID: payment.orderID,
+        payAmount: payment.payAmount,
       });
       await payment.deleteOne();
       await paymentData.updateOne({
@@ -526,6 +594,7 @@ export class GiftcardorderService {
     // not any other state Ex Cancel
     await payment.updateOne({
       retry: true,
+
       errorResponse: getOrder,
     });
     await this.refundPayment(payment.paymentID, getOrder);
@@ -550,6 +619,7 @@ export class GiftcardorderService {
           refund: true,
           refundNote: 'Refund For Order Not Found',
           errorResponse: error,
+          resolved: true,
         },
       );
       await paymentData.updateOne({

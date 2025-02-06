@@ -6,13 +6,16 @@ import { LogService } from 'src/global/log/log.service';
 import { Brand, BrandDocument } from 'src/schemas/brand.schema';
 import { Commission } from 'src/schemas/commission.schems';
 import { Coupon, CouponDocument } from 'src/schemas/coupons.schema';
+import { GiftCard } from 'src/schemas/giftcard.schema';
 import { Offers, OffersDocument } from 'src/schemas/offers.schema';
+import { MyGiftCards } from 'src/schemas/payment/cards.schema';
 import { Payout, PayoutDocument } from 'src/schemas/payouts.schema';
 import {
   Transitions,
   TransitionsDocument,
 } from 'src/schemas/transitions.schema';
 import { User, UserDocument } from 'src/schemas/user.schema';
+import { WhooCard } from 'src/schemas/whoohcards.schema';
 
 @Injectable()
 export class DashbordService {
@@ -31,6 +34,15 @@ export class DashbordService {
 
     @InjectModel(Transitions.name)
     private readonly transitionsModel: Model<TransitionsDocument>,
+
+    @InjectModel(WhooCard.name)
+    private readonly whoowCardModel: Model<WhooCard>,
+
+    @InjectModel(GiftCard.name)
+    private readonly giftCardModel: Model<GiftCard>,
+
+    @InjectModel(MyGiftCards.name)
+    private readonly myGiftCardsModel: Model<MyGiftCards>,
   ) {}
 
   async getStatus() {
@@ -44,6 +56,7 @@ export class DashbordService {
     const totalClicks = await this.getTotalClicks();
     const payoutPi = await this.getPayoutPi();
     const cashflow = await this.getCashFlowPi();
+    const giftcards = await this.getGiftcards();
     return {
       totalUsers,
       totalClicks,
@@ -52,6 +65,7 @@ export class DashbordService {
       totalSell: totalSell,
       totalCommission: cashflow.in,
       payoutPi: payoutPi,
+      giftcards,
       inOutPi: {
         in: cashflow.in,
         out: cashflow.out,
@@ -129,6 +143,18 @@ export class DashbordService {
     return {
       in: completeCommotion.reduce((sum, item) => sum + item.amount, 0),
       out: cashOut.reduce((sum, item) => sum + item.amount, 0),
+    };
+  }
+
+  public async getGiftcards() {
+    const gifterGiftCards = await this.giftCardModel.find();
+    const whoowGiftCards = await this.whoowCardModel.find();
+    const myGiftCards = await this.myGiftCardsModel.find();
+
+    return {
+      gifter: gifterGiftCards.length,
+      whoow: whoowGiftCards.length,
+      sucessOrders: myGiftCards.length,
     };
   }
 }

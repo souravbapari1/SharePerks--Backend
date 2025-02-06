@@ -272,6 +272,7 @@ export class VouchagramService {
       ExternalOrderId: string;
       user: string;
       paymentId: string;
+      payAmount?: number;
     },
     tryAgain: boolean = false,
     refund?: Function,
@@ -307,6 +308,7 @@ export class VouchagramService {
             provider: 'GIFTER',
             errorResponse: res.data,
             retry: tryAgain,
+            payAmount: data.payAmount,
             data,
           });
         } else {

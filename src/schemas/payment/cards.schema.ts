@@ -12,6 +12,9 @@ export class MyGiftCards {
   amount: number;
 
   @Prop()
+  payAmount: number;
+
+  @Prop()
   provider: 'WHOOW' | 'GIFTER';
 
   @Prop()
