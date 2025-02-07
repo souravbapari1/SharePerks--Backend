@@ -281,4 +281,18 @@ export class WhoowService {
       );
     }
   }
+
+  async getBannerGiftCards() {
+    let task: any = await this.whoowModel
+      .find({ isEnable: true, showOnBanner: true })
+      .lean();
+    return task;
+  }
+
+  async getHomeGiftCards() {
+    let task: any = await this.whoowModel
+      .find({ isEnable: true, showOnHome: true })
+      .lean();
+    return task;
+  }
 }

@@ -34,6 +34,6 @@ import { LogModule } from 'src/global/log/log.module';
   ],
   controllers: [GiftcardController],
   providers: [GiftcardService],
-  exports: [GiftcardService],
+  exports: [GiftcardService, GiftcardModule],
 })
 export class GiftcardModule {}

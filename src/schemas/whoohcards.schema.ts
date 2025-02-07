@@ -29,8 +29,17 @@ export class WhooCard {
   @Prop()
   taq: string;
 
+  @Prop()
+  redeemSteps: string;
+
   @Prop({ default: 'whoow' })
   type: string;
+
+  @Prop({ default: false })
+  showOnBanner: boolean;
+
+  @Prop({ default: false })
+  showOnHome: boolean;
 
   @Prop({ type: mongoose.Schema.Types.Mixed })
   data: any;

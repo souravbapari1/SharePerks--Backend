@@ -6,6 +6,8 @@ import { CategoriesModule } from '../categories/categories.module';
 import { BrandModule } from '../brand/brand.module';
 import { CouponModule } from '../coupon/coupon.module';
 import { UserModule } from '../user/user.module';
+import { WhoowModule } from '../whoow/whoow.module';
+import { GiftcardModule } from '../giftcard/giftcard.module';
 
 @Module({
   imports: [
@@ -13,6 +15,8 @@ import { UserModule } from '../user/user.module';
     CategoriesModule,
     BrandModule,
     CouponModule,
+    WhoowModule,
+    GiftcardModule,
     UserModule,
   ],
   controllers: [FeedController],

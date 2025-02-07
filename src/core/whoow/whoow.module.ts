@@ -35,5 +35,6 @@ import { GiftcardorderModule } from '../giftcardorder/giftcardorder.module';
   ],
   controllers: [WhoowController],
   providers: [WhoowService],
+  exports: [WhoowService, WhoowModule],
 })
 export class WhoowModule {}

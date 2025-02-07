@@ -28,6 +28,9 @@ export class CreatePayoutDto {
   @IsNotEmpty()
   user: Types.ObjectId;
 
+  @IsOptional()
+  bank?: any;
+
   @IsNotEmpty()
-  bank: any;
+  upi: any;
 }

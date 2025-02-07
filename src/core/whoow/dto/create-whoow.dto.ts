@@ -26,6 +26,10 @@ export class CreateWhoowDto {
   @IsString()
   stockISIN: string;
 
+  @IsNotEmpty()
+  @IsString()
+  redeemSteps: string;
+
   @IsOptional()
   GiftCardImage: string;
 
@@ -34,6 +38,12 @@ export class CreateWhoowDto {
 
   @IsOptional()
   brandName: string;
+
+  @IsOptional()
+  showOnBanner?: boolean;
+
+  @IsOptional()
+  showOnHome?: boolean;
 
   @IsNotEmpty()
   data: any; // Adjust based on specific structure, if possible

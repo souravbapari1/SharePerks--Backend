@@ -84,6 +84,12 @@ export class GiftcardController {
     file: Express.Multer.File,
     @Body() body: CreateGiftCardDto,
   ) {
+    if (body.showOnBanner) {
+      body.showOnBanner = JSON.parse(body.showOnBanner);
+    }
+    if (body.showOnHome) {
+      body.showOnHome = JSON.parse(body.showOnHome);
+    }
     return await this.grifcardService.createGiftCard(body, file);
   }
 
@@ -100,6 +106,12 @@ export class GiftcardController {
     @Param('id') id: string,
     file?: Express.Multer.File,
   ) {
+    if (body.showOnBanner) {
+      body.showOnBanner = JSON.parse(body.showOnBanner);
+    }
+    if (body.showOnHome) {
+      body.showOnHome = JSON.parse(body.showOnHome);
+    }
     return await this.grifcardService.updateGiftCard(id, body, file);
   }
 

@@ -22,4 +22,7 @@ export class UpdatePayoutDto {
 
   @IsOptional()
   bank?: any;
+
+  @IsOptional()
+  upi?: any;
 }

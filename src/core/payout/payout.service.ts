@@ -27,20 +27,20 @@ export class PayoutService {
     private readonly notification: NotificationService,
   ) {}
   async createNewPayout(data: CreatePayoutDto) {
-    if (!isValidObjectId(data.bank)) {
-      throw new NotAcceptableException('Invalid Bank ID');
-    }
+    // if (!isValidObjectId(data.bank)) {
+    //   throw new NotAcceptableException('Invalid Bank ID');
+    // }
 
-    const bankExist = await this.bankModel.findById(data.bank).lean();
+    // const bankExist = await this.bankModel.findById(data.bank).lean();
     const userInfo = await this.userModel.findById(data.user);
 
     if (!userInfo) {
       throw new NotFoundException('User Not Found On This ID');
     }
 
-    if (!bankExist) {
-      throw new NotFoundException('Bank Not Found On This ID');
-    }
+    // if (!bankExist) {
+    //   throw new NotFoundException('Bank Not Found On This ID');
+    // }
 
     if (data.amount < 100) {
       throw new NotAcceptableException('Minimum payout 100 rs');
@@ -68,7 +68,7 @@ export class PayoutService {
     // });
     //==================
 
-    data.bank = bankExist;
+    // data.bank = bankExist;
     const task = await this.payoutModel.create(data);
     return {
       status: true,

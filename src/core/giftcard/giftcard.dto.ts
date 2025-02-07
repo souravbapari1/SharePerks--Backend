@@ -73,6 +73,12 @@ export class CreateGiftCardDto {
   withoutStockPercent: number;
 
   @IsOptional()
+  showOnBanner?: string;
+
+  @IsOptional()
+  showOnHome?: string;
+
+  @IsOptional()
   offlineStoreAddress?: OfflineStoreAddressDto;
 }
 
@@ -126,6 +132,12 @@ export class UpdateGiftCardDto {
 
   @IsOptional()
   withoutStockPercent?: any;
+
+  @IsOptional()
+  showOnBanner?: string;
+
+  @IsOptional()
+  showOnHome?: string;
 
   @IsOptional()
   offlineStoreAddress?: OfflineStoreAddressDto;

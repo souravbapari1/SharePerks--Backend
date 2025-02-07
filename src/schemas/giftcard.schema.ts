@@ -68,6 +68,12 @@ export class GiftCard {
   @Prop()
   withoutStockPercent: number;
 
+  @Prop({ default: false })
+  showOnBanner: boolean;
+
+  @Prop({ default: false })
+  showOnHome: boolean;
+
   @Prop({ type: OfflineStoreAddressSchema, required: false }) // Make offlineStoreAddress optional
   offlineStoreAddress?: OfflineStoreAddress;
 }

@@ -28,6 +28,9 @@ export class Payout {
 
   @Prop({ type: mongoose.Schema.Types.Mixed })
   bank: any;
+
+  @Prop()
+  upi: string;
 }
 
 // Create the schema factory

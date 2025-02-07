@@ -321,4 +321,18 @@ export class GiftcardService {
       .lean();
     return task;
   }
+
+  async getBannerGiftCards() {
+    let task: any = await this.giftCardModel
+      .find({ isEnable: true, showOnBanner: true })
+      .lean();
+    return task;
+  }
+
+  async getHomeGiftCards() {
+    let task: any = await this.giftCardModel
+      .find({ isEnable: true, showOnHome: true })
+      .lean();
+    return task;
+  }
 }
