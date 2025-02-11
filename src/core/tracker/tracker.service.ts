@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  SerializeOptions,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { LogType } from 'src/constants/constents';
@@ -140,5 +144,9 @@ export class TrackerService {
     });
     //==================
     return link;
+  }
+
+  async logClick(page: number, limit: number, search: string) {
+    return await this.logService.getAllClicks(page, limit, search);
   }
 }

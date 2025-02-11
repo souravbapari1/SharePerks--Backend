@@ -17,6 +17,8 @@ import { LogType, TransitionsType } from 'src/constants/constents';
 import { PayoutModule } from '../payout/payout.module';
 import { Payout, PayoutDocument } from 'src/schemas/payouts.schema';
 import { ObjectId } from 'bson';
+import { ReferReward, ReferRewardDocument } from 'src/schemas/reward.schema';
+import { retry } from 'rxjs';
 
 @Injectable()
 export class TransitionService {
@@ -29,6 +31,9 @@ export class TransitionService {
 
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+
+    @InjectModel(ReferReward.name)
+    private readonly referRewardModel: Model<ReferRewardDocument>,
 
     private readonly logService: LogService,
   ) {}
@@ -197,5 +202,28 @@ export class TransitionService {
       totalTransitionsPending,
       wallet,
     };
+  }
+
+  async getReferralReword() {
+    const data = await this.referRewardModel.findOne({});
+    if (!data) {
+      await this.setReferralReward({
+        refererAmount: 0,
+        referralAmount: 0,
+      });
+      return await this.getReferralReword();
+    }
+    return data;
+  }
+
+  async setReferralReward(data: {
+    refererAmount: number;
+    referralAmount: number;
+  }) {
+    return await this.referRewardModel.findOneAndUpdate(
+      {},
+      { $set: data },
+      { upsert: true, new: true, setDefaultsOnInsert: true },
+    );
   }
 }

@@ -64,6 +64,8 @@ export class OffersService {
       offerImage?: Express.Multer.File[];
     },
   ) {
+    console.log(data);
+
     if (!isValidObjectId(id)) {
       throw new NotAcceptableException('Invalid Offer Object Id');
     }

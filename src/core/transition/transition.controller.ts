@@ -11,11 +11,27 @@ import { TransitionService } from './transition.service';
 import { AuthUserGuard } from 'src/guards/user.guard';
 import { AdminGuard } from 'src/guards/admin.guard';
 import { CreateTransitionsDto } from './dto/createTransitions.dto';
-import { UpdateTransitionsDto } from './dto/updateTransitions.dto';
+import {
+  ReferRewardDto,
+  UpdateTransitionsDto,
+} from './dto/updateTransitions.dto';
 
 @Controller('transition')
 export class TransitionController {
   constructor(private transitionService: TransitionService) {}
+
+  @Get('referral/reward')
+  async getAllRaward() {
+    return await this.transitionService.getReferralReword();
+  }
+
+  @Put('referral/reward')
+  async setReferralReward(@Body() body: ReferRewardDto) {
+    return await this.transitionService.setReferralReward({
+      refererAmount: body.refererAmount,
+      referralAmount: body.referralAmount,
+    });
+  }
 
   @Get('all')
   async getAllTransition() {

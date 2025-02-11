@@ -48,3 +48,13 @@ export class UpdateTransitionsDto {
   @IsOptional()
   data?: any;
 }
+
+export class ReferRewardDto {
+  @IsNumber()
+  @IsOptional()
+  refererAmount?: number;
+
+  @IsNumber()
+  @IsOptional()
+  referralAmount?: number;
+}

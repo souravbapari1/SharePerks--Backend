@@ -43,6 +43,15 @@ export class Brand {
 
   @Prop()
   brandImage: string;
+
+  @Prop()
+  commissionRate: number;
+
+  @Prop()
+  commissionRateWithHolding: number;
+
+  @Prop()
+  commissionType: string;
 }
 
 export const BrandSchema = SchemaFactory.createForClass(Brand);

@@ -54,7 +54,13 @@ export class BrandController {
     @Body() body: CreateBrandDto,
   ) {
     // Parse JSON fields from body
-    console.log(body.offerTerms);
+    if (typeof body.commissionRate === 'string')
+      body.commissionRate = JSON.parse(body.commissionRate);
+
+    if (typeof body.commissionRateWithHolding === 'string')
+      body.commissionRateWithHolding = JSON.parse(
+        body.commissionRateWithHolding,
+      );
 
     if (typeof body.isActive === 'string') {
       body.isActive = JSON.parse(body.isActive);
@@ -94,6 +100,14 @@ export class BrandController {
     @Body() body: UpdateBrandDto,
   ) {
     // Parse JSON fields from body
+    // Parse JSON fields from body
+    if (typeof body.commissionRate === 'string')
+      body.commissionRate = JSON.parse(body.commissionRate);
+
+    if (typeof body.commissionRateWithHolding === 'string')
+      body.commissionRateWithHolding = JSON.parse(
+        body.commissionRateWithHolding,
+      );
 
     if (typeof body.isActive === 'string') {
       body.isActive = JSON.parse(body.isActive);

@@ -687,4 +687,57 @@ export class GiftcardorderService {
     const prefix = 'SHRP_' + data;
     return prefix;
   }
+
+  async getGiftCardOrders(page = 1, limit = 10, search = '') {
+    const skip = (page - 1) * limit;
+
+    const orders = await this.myGiftCardsModel.aggregate([
+      {
+        $addFields: {
+          userObjectId: { $toObjectId: '$user' },
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userObjectId',
+          foreignField: '_id',
+          as: 'userData',
+        },
+      },
+      { $unwind: '$userData' },
+      ...(search
+        ? [
+            {
+              $match: {
+                $or: [
+                  { 'userData.name': { $regex: search, $options: 'i' } },
+                  { 'userData.email': { $regex: search, $options: 'i' } },
+                ],
+              },
+            },
+          ]
+        : []),
+      {
+        $project: {
+          whoowResponse: 0,
+          code: 0,
+          pin: 0,
+        },
+      },
+      { $sort: { createdAt: -1 } },
+
+      { $skip: skip },
+      { $limit: limit },
+    ]);
+
+    const totalCount = await this.myGiftCardsModel.countDocuments();
+
+    return {
+      orders,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+      totalOrders: totalCount,
+    };
+  }
 }

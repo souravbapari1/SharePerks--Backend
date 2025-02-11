@@ -46,6 +46,9 @@ export class User {
 
   @Prop({ default: 'USER' })
   role: string;
+
+  @Prop({ default: true })
+  emailAlerts: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

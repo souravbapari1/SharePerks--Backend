@@ -5,28 +5,19 @@ import {
   Get,
   NotAcceptableException,
   Param,
-  Patch,
   Post,
   Put,
-  UploadedFile,
   UploadedFiles,
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { CreateOfferDto } from './dto/createOffer.dto';
-import {
-  FileFieldsInterceptor,
-  FileInterceptor,
-} from '@nestjs/platform-express';
-import {
-  createFileFilter,
-  FileValidationPipe,
-} from 'src/pipes/file-validate/file-validate.pipe';
+import { FileFieldsInterceptor } from '@nestjs/platform-express';
 import { storage } from 'src/config/storage.config';
-import { OffersService } from './offers.service';
-import { AuthUserGuard } from 'src/guards/user.guard';
 import { AdminGuard } from 'src/guards/admin.guard';
+import { createFileFilter } from 'src/pipes/file-validate/file-validate.pipe';
+import { CreateOfferDto } from './dto/createOffer.dto';
 import { UpdateOfferDto } from './dto/updateOffer.dto';
+import { OffersService } from './offers.service';
 
 @Controller('offers')
 export class OffersController {
@@ -85,6 +76,12 @@ export class OffersController {
   ) {
     if (typeof body.commissionRate === 'string')
       body.commissionRate = JSON.parse(body.commissionRate);
+
+    if (typeof body.commissionRateWithHolding === 'string')
+      body.commissionRateWithHolding = JSON.parse(
+        body.commissionRateWithHolding,
+      );
+
     if (typeof body.isEnable === 'string')
       body.isEnable = JSON.parse(body.isEnable);
     if (typeof body.isInSlide === 'string')
@@ -136,6 +133,12 @@ export class OffersController {
   ) {
     if (typeof body.commissionRate === 'string')
       body.commissionRate = JSON.parse(body.commissionRate);
+
+    if (typeof body.commissionRateWithHolding === 'string')
+      body.commissionRateWithHolding = JSON.parse(
+        body.commissionRateWithHolding,
+      );
+
     if (typeof body.isEnable === 'string')
       body.isEnable = JSON.parse(body.isEnable);
     if (typeof body.isInSlide === 'string')

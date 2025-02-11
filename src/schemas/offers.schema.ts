@@ -18,6 +18,9 @@ export class Offers {
   commissionRate: number;
 
   @Prop()
+  commissionRateWithHolding: number;
+
+  @Prop()
   commissionType: string;
 
   @Prop()

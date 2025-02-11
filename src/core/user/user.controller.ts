@@ -59,6 +59,9 @@ export class UserController {
     @Body() body: UserDto,
     @UploadedFile() image?: Express.Multer.File,
   ) {
+    // if (body.emailAlerts) {
+    //   return JSON.parse(body.emailAlerts);
+    // }
     return await this.userService.updateUser(req.user, body, image);
   }
 

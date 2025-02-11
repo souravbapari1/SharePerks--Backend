@@ -1,4 +1,10 @@
-import { Controller, Get, NotAcceptableException, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  NotAcceptableException,
+  Param,
+  Query,
+} from '@nestjs/common';
 import { TrackerService } from './tracker.service';
 import { isValidObjectId } from 'mongoose';
 
@@ -18,5 +24,18 @@ export class TrackerController {
       throw new NotAcceptableException('Not A Valid Tracker Id');
     }
     return await this.trackerService.getLink({ id: id, type, user });
+  }
+
+  @Get('click-activity')
+  async clickActivity(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+    @Query('search') search: string = '',
+  ) {
+    return await this.trackerService.logClick(
+      Number(page),
+      Number(limit),
+      search,
+    );
   }
 }

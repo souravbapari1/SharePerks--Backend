@@ -46,4 +46,7 @@ export class UserDto {
   @IsOptional()
   @IsString()
   role?: string;
+
+  @IsOptional()
+  emailAlerts?: boolean;
 }

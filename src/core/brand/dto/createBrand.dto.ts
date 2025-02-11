@@ -4,7 +4,9 @@ import {
   IsBoolean,
   IsNumber,
   IsNotEmpty,
+  IsEnum,
 } from 'class-validator';
+import { CommissionType } from 'src/core/offers/dto/createOffer.dto';
 
 export class CreateBrandDto {
   @IsString()
@@ -49,4 +51,13 @@ export class CreateBrandDto {
   @IsString()
   @IsOptional()
   brandImage?: string;
+
+  @IsString()
+  commissionRate: number;
+
+  @IsString()
+  commissionRateWithHolding: number;
+
+  @IsEnum(CommissionType)
+  commissionType: CommissionType;
 }

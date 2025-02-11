@@ -4,7 +4,9 @@ import {
   IsBoolean,
   IsNumber,
   IsMongoId,
+  IsEnum,
 } from 'class-validator';
+import { CommissionType } from 'src/core/offers/dto/createOffer.dto';
 
 export class UpdateBrandDto {
   @IsString()
@@ -54,4 +56,14 @@ export class UpdateBrandDto {
   @IsString()
   @IsOptional()
   brandImage?: string;
+
+  @IsOptional()
+  commissionRate?: number;
+
+  @IsOptional()
+  commissionRateWithHolding?: number;
+
+  @IsEnum(CommissionType)
+  @IsOptional()
+  commissionType: CommissionType;
 }

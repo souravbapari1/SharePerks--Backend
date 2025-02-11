@@ -24,6 +24,9 @@ export class CreateOfferDto {
   @IsString()
   commissionRate: number;
 
+  @IsString()
+  commissionRateWithHolding: number;
+
   @IsEnum(CommissionType)
   commissionType: CommissionType;
 

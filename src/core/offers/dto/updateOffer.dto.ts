@@ -1,11 +1,4 @@
-import {
-  IsString,
-  IsNumber,
-  IsDate,
-  IsMongoId,
-  IsOptional,
-  IsEnum,
-} from 'class-validator';
+import { IsEnum, IsMongoId, IsOptional, IsString } from 'class-validator';
 import { CommissionType } from './createOffer.dto';
 
 export class UpdateOfferDto {
@@ -22,6 +15,9 @@ export class UpdateOfferDto {
 
   @IsOptional()
   commissionRate?: number;
+
+  @IsOptional()
+  commissionRateWithHolding?: number;
 
   @IsEnum(CommissionType)
   @IsOptional()

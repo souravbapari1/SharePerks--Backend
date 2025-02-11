@@ -79,6 +79,8 @@ export class BrandService {
     data: UpdateBrandDto;
     id: string;
   }) {
+    console.log(data);
+
     if (files.bannerImage?.length) {
       data.bannerImage = files.bannerImage[0].path;
     }

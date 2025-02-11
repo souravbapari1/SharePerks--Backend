@@ -6,6 +6,7 @@ import { LogModule } from 'src/global/log/log.module';
 import { Transitions, TransitionsSchema } from 'src/schemas/transitions.schema';
 import { User, UserSchema } from 'src/schemas/user.schema';
 import { Payout, PayoutSchema } from 'src/schemas/payouts.schema';
+import { ReferReward, ReferRewardSchema } from 'src/schemas/reward.schema';
 
 @Module({
   imports: [
@@ -13,6 +14,11 @@ import { Payout, PayoutSchema } from 'src/schemas/payouts.schema';
       { name: Transitions.name, schema: TransitionsSchema },
       { name: User.name, schema: UserSchema },
       { name: Payout.name, schema: PayoutSchema },
+      { name: Payout.name, schema: PayoutSchema },
+      {
+        name: ReferReward.name,
+        schema: ReferRewardSchema,
+      },
     ]),
     LogModule,
   ],

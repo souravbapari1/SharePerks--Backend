@@ -53,4 +53,17 @@ export class GiftcardorderController {
       Number(limit),
     );
   }
+
+  @Get('/orders')
+  async getOrders(
+    @Query('search') searchQuery?: string, // Optional search query
+    @Query('page') page: number = 1, // Default page 1
+    @Query('limit') limit: number = 10, // Default limit 10
+  ) {
+    return await this.giftcardorderService.getGiftCardOrders(
+      Number(page),
+      Number(limit),
+      searchQuery || '',
+    );
+  }
 }
