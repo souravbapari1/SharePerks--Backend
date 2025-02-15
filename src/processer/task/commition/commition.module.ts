@@ -11,6 +11,7 @@ import { Transitions, TransitionsSchema } from 'src/schemas/transitions.schema';
 import { CommitionService } from './commition.service';
 import { AdmitadModule } from '../admitad/admitad.module';
 import { CuelinksModule } from '../cuelinks/cuelinks.module';
+import { Holdings, HoldingsSchema } from 'src/schemas/holdings.schema';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { CuelinksModule } from '../cuelinks/cuelinks.module';
       { name: Brand.name, schema: BrandSchema },
       { name: Coupon.name, schema: CouponSchema },
       { name: Transitions.name, schema: TransitionsSchema },
+      { name: Holdings.name, schema: HoldingsSchema },
     ]),
     AdmitadModule,
     CuelinksModule,

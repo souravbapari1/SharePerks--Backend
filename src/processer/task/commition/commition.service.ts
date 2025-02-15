@@ -23,6 +23,7 @@ import {
 } from '../cuelinks/cuelinks';
 import { AdmitedTransions } from '../admitad/admitad';
 import { CuelinksService } from '../cuelinks/cuelinks.service';
+import { Holdings, HoldingsDocument } from 'src/schemas/holdings.schema';
 
 @Injectable()
 export class CommitionService {
@@ -60,6 +61,8 @@ export class CommitionService {
     @InjectModel(Brand.name)
     private readonly brandModel: Model<BrandDocument>,
 
+    @InjectModel(Holdings.name)
+    private readonly holdingsModel: Model<HoldingsDocument>,
     /**
      * Offers model to find the offer
      */
@@ -85,6 +88,7 @@ export class CommitionService {
   async trackAdmitedUpdateProcess() {
     const transitionsData =
       await this.admitedService.getActionStatisticsForLast30Days();
+    console.log(JSON.stringify(transitionsData));
     if (transitionsData) {
       transitionsData.forEach(async (transition) => {
         const user = transition.userId;
@@ -105,7 +109,7 @@ export class CommitionService {
           type: type,
         });
 
-        if (transition) {
+        if (transitions) {
           // update task Here
         } else {
           await this.newCommunion(transition);
@@ -124,6 +128,7 @@ export class CommitionService {
       transitionsData.forEach(async (transition) => {
         try {
           const user = transition.userId;
+
           const type = transition.type;
           const typeDocId = transition.typeId;
           const provider = transition.provider;
@@ -138,14 +143,30 @@ export class CommitionService {
           } catch (error) {
             throw new NotFoundException('User Not Found this ID');
           }
+
           const transitions = await this.transitionsModel.findOne({
             transitions_id: communionId,
-            user: user,
-            type: type,
+            user: new mongoose.Types.ObjectId(user),
           });
 
           if (transitions) {
-            // update task Here
+            await this.transitionsModel.updateOne(
+              { _id: transitions._id },
+              {
+                $set: {
+                  status: transition.status,
+                },
+              },
+            );
+            if (transitions.status == 'payable') {
+              // update task Here
+              await this.transferMoney({
+                tDocID: transitions._id.toString(),
+                type: transition.type,
+                typeDocId: transition.typeId,
+                user,
+              });
+            }
           } else {
             await this.newCommunion(transition);
           }
@@ -164,8 +185,10 @@ export class CommitionService {
     transition: TransitionsData<AdmitedTransions | Transaction>,
   ) {
     const user = transition.userId;
+
     const type = transition.type as 'brand' | 'coupon' | 'offer';
     const typeDocId = transition.typeId;
+    // const typeDocId = '67a2f503b0eb90fbd18caa7a';
 
     const status = transition.status;
     const communionId = transition.provider_id;
@@ -233,5 +256,88 @@ export class CommitionService {
     }
 
     throw new NotFoundException('Invalid Tracking type');
+  }
+
+  public async transferMoney({
+    tDocID,
+    type,
+    typeDocId,
+    user,
+  }: {
+    user: string;
+    type: string;
+    typeDocId: string;
+    tDocID: string;
+  }) {
+    const orderItem = await this.getCommunionTypeOrderExist(type, typeDocId);
+    const commotionType = orderItem.data.commissionType;
+    const basicRate = orderItem.data.commissionRate;
+    const withHoldingRate = (orderItem.data as any).commissionRateWithHolding;
+    const STOCK = orderItem.data.stockISIN;
+
+    const check = await this.transitionsModel.findOne({
+      _id: tDocID,
+    });
+
+    if (check.completePayment == true) {
+      return;
+    }
+
+    let availableStock = false;
+
+    const userData = await this.userModel.findOne({ _id: user });
+    if (userData.brokerConnected == true) {
+      const holdings = await this.holdingsModel.findOne({ user: user });
+
+      if (holdings) {
+        const stock = holdings.data.securities.find(
+          (e: any) => e.isin == STOCK,
+        );
+        if (stock) {
+          availableStock = stock.available;
+        }
+      }
+    }
+    console.log({
+      commotionType,
+      basicRate,
+      withHoldingRate,
+      availableStock,
+    });
+
+    let commission = 0;
+
+    if (commotionType == 'AMOUNT') {
+      commission = availableStock ? withHoldingRate : basicRate;
+    } else {
+      commission = availableStock
+        ? this.calculatePercentage(check.amount, withHoldingRate)
+        : this.calculatePercentage(check.amount, basicRate);
+    }
+
+    if (check.completePayment == false) {
+      await this.userModel.findOneAndUpdate(
+        { _id: user },
+        {
+          $inc: {
+            walletAmount: commission,
+          },
+        },
+      );
+      await this.transitionsModel.findOneAndUpdate(
+        { _id: tDocID },
+        {
+          $set: {
+            completePayment: true,
+            payoutStatus: 'SUCCESS',
+            payAmount: commission,
+          },
+        },
+      );
+    }
+  }
+
+  public calculatePercentage(amount: number, percentage: number): number {
+    return (amount * percentage) / 100;
   }
 }

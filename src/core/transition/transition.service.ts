@@ -186,11 +186,11 @@ export class TransitionService {
       0,
     );
     const totalTransitions = transitions.reduce(
-      (sum, item) => sum + item.amount,
+      (sum, item) => sum + item.payAmount || 0,
       0,
     );
     const totalTransitionsPending = transitions.reduce(
-      (sum, item) => sum + item.amount,
+      (sum, item) => sum + item.payAmount || 0,
       0,
     );
     const wallet = user.walletAmount;

@@ -10,6 +10,12 @@ export class Transitions {
   @Prop()
   amount: number;
 
+  @Prop()
+  payAmount: number;
+
+  @Prop({ default: 'PENDING' })
+  payoutStatus: string;
+
   @Prop({ unique: true })
   transitions_id: string;
 

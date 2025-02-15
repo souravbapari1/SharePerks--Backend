@@ -82,7 +82,7 @@ export class AdmitadService {
       // Calculate the date range using native JavaScript Date object
       const today = new Date();
       const date30DaysAgo = new Date();
-      date30DaysAgo.setDate(today.getDate() - 30); // Subtract 30 days from today
+      date30DaysAgo.setDate(today.getDate() - 360); // Subtract 30 days from today
 
       const dateStart = this.formatDate(date30DaysAgo); // Format date 30 days ago
       const dateEnd = this.formatDate(today); // Format today's date
@@ -130,7 +130,7 @@ export class AdmitadService {
             // Use the website name from the Admitad API
             store_name: e.website_name,
             // Use the subid field as the user ID
-            userId: e.subid || '', // Handle potential null subid
+            userId: e.subid || e.subid1 || '', // Handle potential null subid Is User DOc ID
             // Set the provider to admitad
             provider: 'admitad',
             // Use the subid2 field as the type

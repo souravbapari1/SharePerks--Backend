@@ -49,11 +49,20 @@ export class TaskService {
     }
   }
 
-  @Cron(CronExpression.EVERY_DAY_AT_10PM)
+  @Cron(CronExpression.EVERY_30_SECONDS)
   async handleAdmitedCommitionsStstus() {
     try {
       await this.commitionService.trackAdmitedUpdateProcess();
       this.log.log('@CRON - Update Admited data on Commition');
+    } catch (error) {
+      console.log(error.message || error);
+    }
+  }
+  @Cron(CronExpression.EVERY_DAY_AT_11PM)
+  async handleCuelinksCommitionsStstus() {
+    try {
+      await this.commitionService.trackCuelinksUpdateProcess();
+      this.log.log('@CRON - Update Cuelinks data on Commition');
     } catch (error) {
       console.log(error.message || error);
     }
@@ -74,16 +83,6 @@ export class TaskService {
     try {
       await this.giftCardOrders.retryAllWhoowErrors();
       this.log.log('@CRON - ReTry Whoow errors');
-    } catch (error) {
-      console.log(error.message || error);
-    }
-  }
-
-  @Cron(CronExpression.EVERY_DAY_AT_11PM)
-  async handleCuelinksCommitionsStstus() {
-    try {
-      await this.commitionService.trackCuelinksUpdateProcess();
-      this.log.log('@CRON - Update Cuelinks data on Commition');
     } catch (error) {
       console.log(error.message || error);
     }

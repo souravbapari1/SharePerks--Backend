@@ -55,7 +55,7 @@ export class TrackerService {
     }
 
     await brand.updateOne({ clicks: brand.clicks + 1 });
-    const link = `${brand.linkUrl}&subid=${userInfo._id}&subid1=${brand.stockISIN}&subid2=brand&subid3=${
+    const link = `${brand.linkUrl}&subid=${userInfo._id}&subid1=${userInfo._id}&subid2=brand&subid3=${
       brand._id
     }&subid4=${JSON.stringify({
       name: userInfo.name,
@@ -88,7 +88,7 @@ export class TrackerService {
     }
 
     await offer.updateOne({ clicks: offer.clicks + 1 });
-    const link = `${offer.link}&subid=${userInfo._id}&subid1=${offer.stockISIN}&subid2=offer&subid3=${
+    const link = `${offer.link}&subid=${userInfo._id}&subid1=${userInfo._id}&subid2=offer&subid3=${
       offer._id
     }&subid4=${JSON.stringify({
       name: userInfo.name,
@@ -121,7 +121,7 @@ export class TrackerService {
     }
 
     await coupon.updateOne({ clicks: coupon.clicks + 1 });
-    const link = `${coupon.link}&subid=${userInfo._id}&subid1=${coupon.stockISIN}&subid2=coupon&subid3=${
+    const link = `${coupon.link}&subid=${userInfo._id}&subid1=${userInfo._id}&subid2=coupon&subid3=${
       coupon._id
     }&subid4=${JSON.stringify({
       name: userInfo.name,

@@ -42,7 +42,7 @@ export class CuelinksService {
           },
         );
 
-        const storeData = data.data.campaigns.map((e) => {
+        const storeData = data?.data?.campaigns?.map((e) => {
           return {
             cuelink_id: e.id.toString(),
             data: e,
@@ -97,6 +97,8 @@ export class CuelinksService {
         },
       },
     );
+
+    console.log(JSON.stringify(data));
 
     const transitionsData: TransitionsData<Transaction>[] =
       data.transactions.map((e) => {
