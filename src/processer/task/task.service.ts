@@ -49,7 +49,7 @@ export class TaskService {
     }
   }
 
-  @Cron(CronExpression.EVERY_30_SECONDS)
+  @Cron(CronExpression.EVERY_12_HOURS)
   async handleAdmitedCommitionsStstus() {
     try {
       await this.commitionService.trackAdmitedUpdateProcess();
@@ -58,7 +58,7 @@ export class TaskService {
       console.log(error.message || error);
     }
   }
-  @Cron(CronExpression.EVERY_DAY_AT_11PM)
+  @Cron(CronExpression.EVERY_12_HOURS)
   async handleCuelinksCommitionsStstus() {
     try {
       await this.commitionService.trackCuelinksUpdateProcess();

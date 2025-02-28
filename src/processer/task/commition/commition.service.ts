@@ -110,7 +110,23 @@ export class CommitionService {
         });
 
         if (transitions) {
-          // update task Here
+          await this.transitionsModel.updateOne(
+            { _id: transitions._id },
+            {
+              $set: {
+                status: transition.status,
+              },
+            },
+          );
+          if (transitions.status.toLowerCase() == 'approved') {
+            // update task Here
+            await this.transferMoney({
+              tDocID: transitions._id.toString(),
+              type: transition.type,
+              typeDocId: transition.typeId,
+              user,
+            });
+          }
         } else {
           await this.newCommunion(transition);
         }
@@ -158,7 +174,7 @@ export class CommitionService {
                 },
               },
             );
-            if (transitions.status == 'payable') {
+            if (transitions.status.toLowerCase() == 'payable') {
               // update task Here
               await this.transferMoney({
                 tDocID: transitions._id.toString(),
@@ -196,10 +212,7 @@ export class CommitionService {
     const tracking = await this.getCommunionTypeOrderExist(type, typeDocId);
 
     await this.transitionService.createUserTransition({
-      amount:
-        transition.provider == 'cuelinks'
-          ? transition.commission
-          : transition.amount,
+      amount: transition.amount,
       data: transition,
       status: status,
       type: TransitionsType.COMMOTION,

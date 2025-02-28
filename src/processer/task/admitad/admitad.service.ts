@@ -121,8 +121,10 @@ export class AdmitadService {
             // Generate a unique provider ID using the order ID
             provider_id: `admitad_${e.order_id}`,
             // Set the amount and commission to 0
-            amount: 0,
-            commission: 0,
+            amount: e.payment,
+            commission:
+              e.positions.reduce((acc, cur) => acc + Number(cur.amount), 0) ||
+              0,
             // Use the status from the Admitad API
             status: e.status,
             // Use the currency from the Admitad API

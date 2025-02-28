@@ -98,8 +98,6 @@ export class CuelinksService {
       },
     );
 
-    console.log(JSON.stringify(data));
-
     const transitionsData: TransitionsData<Transaction>[] =
       data.transactions.map((e) => {
         return {

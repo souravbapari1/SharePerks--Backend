@@ -29,7 +29,7 @@ export type AdmitedTransions = {
   keyword: any;
   advcampaign_name: string;
   advcampaign_id: number;
-  cart?: number;
+  cart: number;
   subid: any;
   subid1: any;
   subid2: any;
@@ -48,21 +48,23 @@ export type AdmitedTransions = {
   processed: number;
   paid: number;
   order_id: string;
-  closing_date: string;
   action_type: string;
   promocode: string;
+  closing_date: string;
   status_updated: string;
-  positions: Array<{
-    tariff_id: number;
-    payment: string;
-    rate: any;
-    datetime: string;
-    amount: string;
-    percentage: boolean;
-    product_url: string;
-    id: number;
-  }>;
+  positions: Position[];
 };
+
+export interface Position {
+  tariff_id: number;
+  payment: string;
+  rate: any;
+  datetime: string;
+  amount: string;
+  percentage: boolean;
+  product_url: string;
+  id: number;
+}
 
 export interface AdvCampaigns {
   results: Result[];
