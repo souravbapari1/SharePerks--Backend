@@ -47,4 +47,7 @@ export class CreateTransitionsDto {
 
   @IsNotEmpty()
   data: any;
+
+  @IsOptional()
+  payAmount?: number;
 }

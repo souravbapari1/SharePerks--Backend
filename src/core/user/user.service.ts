@@ -231,4 +231,9 @@ export class UserService {
     const data = await this.notificationModel.deleteMany({ user: id });
     return data;
   }
+
+  async getUserEmails() {
+    const data = await this.UserModel.find({ emailAlerts: true }).lean();
+    return data.map((e) => e.email);
+  }
 }

@@ -10,10 +10,6 @@ import {
 @Injectable()
 export class NotificationService {
   private host = 'https://worker.shareperks.in';
-  private access_key = '1236789';
-  private authentication =
-    'os_v2_app_2xknm6rvhzdmjlu6swdex3vdtvagxntmf75ezbfbb2nphqwkhssjexfsfpyro6ey5tpwfhjuodvmzoze7cskm6zm5slbxlvf6ag4xqy';
-  private app_id = 'd5d4d67a-353e-46c4-ae9e-95864beea39d';
   constructor(
     private readonly httpService: HttpService,
     @InjectModel(Notification.name)
@@ -31,18 +27,11 @@ export class NotificationService {
   }) {
     try {
       const task = await this.httpService.axiosRef.post(
-        `${this.host}/onesignal/push/quick/${id}`,
+        `${this.host}/notification`,
         {
-          app_id: this.app_id,
           title: title,
-          desc: message,
-        },
-        {
-          headers: {
-            Authorization: `${this.authentication}`,
-            'Content-Type': 'application/json',
-            'access-key': this.access_key,
-          },
+          body: message,
+          users: [id],
         },
       );
       await this.notificationModel.create({
@@ -71,17 +60,10 @@ export class NotificationService {
       const task = await this.httpService.axiosRef.post(
         `${this.host}/onesignal/push/`,
         {
-          app_id: this.app_id,
           title: title,
-          desc: message,
+          body: message,
           image: image,
-        },
-        {
-          headers: {
-            Authorization: `${this.authentication}`,
-            'Content-Type': 'application/json',
-            'access-key': this.access_key,
-          },
+          users: [id],
         },
       );
       await this.notificationModel.create({

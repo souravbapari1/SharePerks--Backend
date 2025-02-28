@@ -64,7 +64,10 @@ export class UserController {
     // }
     return await this.userService.updateUser(req.user, body, image);
   }
-
+  @Post('bulk/emails')
+  async sendEmails() {
+    return await this.userService.getUserEmails();
+  }
   @UseGuards(AuthUserGuard)
   @UseGuards(AuthUserGuard)
   @Post('holdings')

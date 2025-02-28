@@ -58,7 +58,7 @@ export class TaskService {
       console.log(error.message || error);
     }
   }
-  @Cron(CronExpression.EVERY_12_HOURS)
+  @Cron(CronExpression.EVERY_30_SECONDS)
   async handleCuelinksCommitionsStstus() {
     try {
       await this.commitionService.trackCuelinksUpdateProcess();

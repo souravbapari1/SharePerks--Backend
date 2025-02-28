@@ -12,6 +12,7 @@ import { CommitionService } from './commition.service';
 import { AdmitadModule } from '../admitad/admitad.module';
 import { CuelinksModule } from '../cuelinks/cuelinks.module';
 import { Holdings, HoldingsSchema } from 'src/schemas/holdings.schema';
+import { NotificationModule } from 'src/global/notification/notification.module';
 
 @Module({
   imports: [
@@ -27,6 +28,7 @@ import { Holdings, HoldingsSchema } from 'src/schemas/holdings.schema';
     AdmitadModule,
     CuelinksModule,
     TransitionModule,
+    NotificationModule,
   ],
   providers: [CommitionService],
   exports: [CommitionService],

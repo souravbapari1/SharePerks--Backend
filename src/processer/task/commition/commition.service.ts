@@ -24,6 +24,7 @@ import {
 import { AdmitedTransions } from '../admitad/admitad';
 import { CuelinksService } from '../cuelinks/cuelinks.service';
 import { Holdings, HoldingsDocument } from 'src/schemas/holdings.schema';
+import { NotificationService } from 'src/global/notification/notification.service';
 
 @Injectable()
 export class CommitionService {
@@ -38,6 +39,8 @@ export class CommitionService {
      * Transition service to log the transitions
      */
     private readonly transitionService: TransitionService,
+
+    private readonly notificationService: NotificationService,
 
     /**
      * Admitad service to fetch data from Admitad
@@ -88,7 +91,7 @@ export class CommitionService {
   async trackAdmitedUpdateProcess() {
     const transitionsData =
       await this.admitedService.getActionStatisticsForLast30Days();
-    console.log(JSON.stringify(transitionsData));
+
     if (transitionsData) {
       transitionsData.forEach(async (transition) => {
         const user = transition.userId;
@@ -175,7 +178,7 @@ export class CommitionService {
               },
             );
             if (transitions.status.toLowerCase() == 'payable') {
-              // update task Here
+              // update task Here [x]
               await this.transferMoney({
                 tDocID: transitions._id.toString(),
                 type: transition.type,
@@ -211,11 +214,19 @@ export class CommitionService {
 
     const tracking = await this.getCommunionTypeOrderExist(type, typeDocId);
 
+    const commission = await this.getCommissionRate({
+      type,
+      typeDocId,
+      user,
+      amount: transition.amount,
+    });
+
     await this.transitionService.createUserTransition({
       amount: transition.amount,
       data: transition,
       status: status,
       type: TransitionsType.COMMOTION,
+      payAmount: commission,
       user: user,
       brand: tracking.brand.toString(),
       title: transition.store_name,
@@ -224,6 +235,16 @@ export class CommitionService {
       typeDocId: typeDocId,
       transitions_id: communionId,
     });
+
+    try {
+      this.notificationService.sendNotificationQuickUser({
+        id: user,
+        message: 'You have received a commotion from ' + transition.store_name,
+        title: 'Commotion Received',
+      });
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   /**
@@ -282,12 +303,6 @@ export class CommitionService {
     typeDocId: string;
     tDocID: string;
   }) {
-    const orderItem = await this.getCommunionTypeOrderExist(type, typeDocId);
-    const commotionType = orderItem.data.commissionType;
-    const basicRate = orderItem.data.commissionRate;
-    const withHoldingRate = (orderItem.data as any).commissionRateWithHolding;
-    const STOCK = orderItem.data.stockISIN;
-
     const check = await this.transitionsModel.findOne({
       _id: tDocID,
     });
@@ -296,37 +311,12 @@ export class CommitionService {
       return;
     }
 
-    let availableStock = false;
-
-    const userData = await this.userModel.findOne({ _id: user });
-    if (userData.brokerConnected == true) {
-      const holdings = await this.holdingsModel.findOne({ user: user });
-
-      if (holdings) {
-        const stock = holdings.data.securities.find(
-          (e: any) => e.isin == STOCK,
-        );
-        if (stock) {
-          availableStock = stock.available;
-        }
-      }
-    }
-    console.log({
-      commotionType,
-      basicRate,
-      withHoldingRate,
-      availableStock,
+    const commission = await this.getCommissionRate({
+      type,
+      typeDocId,
+      user,
+      amount: check.amount,
     });
-
-    let commission = 0;
-
-    if (commotionType == 'AMOUNT') {
-      commission = availableStock ? withHoldingRate : basicRate;
-    } else {
-      commission = availableStock
-        ? this.calculatePercentage(check.amount, withHoldingRate)
-        : this.calculatePercentage(check.amount, basicRate);
-    }
 
     if (check.completePayment == false) {
       await this.userModel.findOneAndUpdate(
@@ -352,5 +342,62 @@ export class CommitionService {
 
   public calculatePercentage(amount: number, percentage: number): number {
     return (amount * percentage) / 100;
+  }
+
+  public async getCommissionRate({
+    type,
+    typeDocId,
+    user,
+    amount,
+  }: {
+    user: string;
+    type: string;
+    typeDocId: string;
+    amount: number;
+  }) {
+    const orderItem = await this.getCommunionTypeOrderExist(type, typeDocId);
+    const commotionType = orderItem.data.commissionType;
+    const basicRate = orderItem.data.commissionRate;
+    const withHoldingRate = (orderItem.data as any).commissionRateWithHolding;
+    const STOCK = orderItem.data.stockISIN;
+
+    let availableStock = false;
+
+    console.log({
+      type,
+      typeDocId,
+      commotionType,
+      basicRate,
+      withHoldingRate,
+      STOCK,
+      availableStock,
+
+      amount,
+    });
+
+    const userData = await this.userModel.findOne({ _id: user });
+    if (userData.brokerConnected == true) {
+      const holdings = await this.holdingsModel.findOne({ user: user });
+
+      if (holdings) {
+        const stock = holdings.data.securities.find(
+          (e: any) => e.isin == STOCK,
+        );
+        if (stock) {
+          availableStock = stock.available;
+        }
+      }
+    }
+
+    let commission = 0;
+
+    if (commotionType == 'AMOUNT') {
+      commission = availableStock ? withHoldingRate : basicRate;
+    } else {
+      commission = availableStock
+        ? this.calculatePercentage(amount, withHoldingRate)
+        : this.calculatePercentage(amount, basicRate);
+    }
+    return commission;
   }
 }
