@@ -36,7 +36,7 @@ export class UserService {
     private readonly BankService: BankService,
     private readonly logService: LogService,
     private readonly transitionService: TransitionService,
-  ) {}
+  ) { }
 
   async getUser(user: UserDto) {
     const getHoldings = await this.HoldingsModel.findOne({ user: user._id });
@@ -159,6 +159,20 @@ export class UserService {
     return data;
   }
 
+
+  async blockUnblockUser(id: string) {
+    const user = await this.UserModel.findOne({ _id: id });
+    if (!user) {
+      throw new NotFoundException('User Not Found');
+    }
+    await this.UserModel.updateOne({ _id: id }, { isBlocked: !user.isBlocked });
+    return {
+      status: true,
+      message: `User ${user.name} has been ${user.isBlocked ? 'blocked' : 'unblocked'}`,
+      user: user,
+    };
+  }
+
   async getPaginationUsers(page: number = 1, limit: number = 10) {
     const skip = (page - 1) * limit;
 
@@ -226,6 +240,13 @@ export class UserService {
     const data = await this.notificationModel.find({ user: id }).lean();
     return data;
   }
+
+
+  async getMyReferUser(id: string) {
+    const data = await this.UserModel.find({ referByUser: id }, { expOtp: 0, otp: 0, walletAmount: 0, mobile: 0, email: 0 }).lean();
+    return data;
+  }
+
 
   async deleteUserNotification(id: string) {
     const data = await this.notificationModel.deleteMany({ user: id });

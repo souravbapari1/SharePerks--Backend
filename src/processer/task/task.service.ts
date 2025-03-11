@@ -16,7 +16,7 @@ export class TaskService {
     private readonly commitionService: CommitionService,
     private readonly whoowApiService: WhoowApiService,
     private readonly giftCardOrders: GiftcardorderService,
-  ) {}
+  ) { }
   private log = new Logger();
   @Cron(CronExpression.EVERY_12_HOURS)
   async handleUpdateProductsCron() {

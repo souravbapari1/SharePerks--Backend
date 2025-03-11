@@ -7,7 +7,70 @@ import { LogType } from 'src/constants/constents';
 
 @Injectable()
 export class LogService {
-  constructor(@InjectModel(Log.name) private readonly logModel: Model<Log>) {}
+  constructor(@InjectModel(Log.name) private readonly logModel: Model<Log>) { }
+
+
+  async getAllLogs(page = 1, limit = 40, search = '') {
+    const skip = (page - 1) * limit;
+
+    const matchStage = {
+      $match: {
+        ...(search
+          ? { 'userData.name': { $regex: search, $options: 'i' } }
+          : {}),
+      },
+    };
+
+    const pipeline = [
+      {
+        $addFields: {
+          userObjectId: { $toObjectId: '$user' },
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'userObjectId',
+          foreignField: '_id',
+          as: 'userData',
+        },
+      },
+      {
+        $unwind: '$userData',
+      },
+      matchStage,
+      {
+        $sort: { createdAt: -1 },
+      },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: limit,
+      },
+    ];
+
+    const data = await this.logModel.aggregate(pipeline as any);
+
+    const totalCountPipeline = [
+      {
+        $count: 'totalCount',
+      },
+    ];
+
+    const totalCountResult = await this.logModel.aggregate(totalCountPipeline);
+    const totalCount = totalCountResult.length
+      ? totalCountResult[0].totalCount
+      : 0;
+
+    return {
+      data,
+      totalCount,
+      totalPages: Math.ceil(totalCount / limit),
+      currentPage: page,
+    };
+  }
+
 
   async getAllClicks(page = 1, limit = 10, search = '') {
     const skip = (page - 1) * limit;

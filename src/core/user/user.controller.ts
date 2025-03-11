@@ -24,7 +24,14 @@ import { AdminDto } from './dto/admin.dto';
 
 @Controller('user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
+
+
+  @Get('referrals/:id')
+  @UseGuards(AuthUserGuard)
+  async getMyReferUser(@Param('id') id: string) {
+    return await this.userService.getMyReferUser(id);
+  }
 
   @Get('notifications/:id')
   @UseGuards(AuthUserGuard)
@@ -107,10 +114,21 @@ export class UserController {
     return await this.userService.getUsers();
   }
 
+
+
+
   @UseGuards(AdminGuard)
   @Get(':id')
   async getFFullUsers(@Param('id') id: string) {
     return await this.userService.getFullUser(id);
+  }
+
+  @UseGuards(AdminGuard)
+  @Get('block/:user')
+  async blockUser(
+    @Param('user') user: string,
+  ) {
+    return await this.userService.blockUnblockUser(user)
   }
 
   @UseGuards(AdminGuard)
@@ -127,4 +145,6 @@ export class UserController {
   ) {
     return await this.userService.getPaginationUsers(page, limit);
   }
+
+
 }

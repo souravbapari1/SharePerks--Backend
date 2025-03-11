@@ -50,4 +50,7 @@ export class CreateTransitionsDto {
 
   @IsOptional()
   payAmount?: number;
+
+  @IsOptional()
+  providerCommotion?: number;
 }

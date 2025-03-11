@@ -10,7 +10,7 @@ import { isValidObjectId } from 'mongoose';
 
 @Controller('tracker')
 export class TrackerController {
-  constructor(private readonly trackerService: TrackerService) {}
+  constructor(private readonly trackerService: TrackerService) { }
   @Get(':id/:type/:user')
   async link(
     @Param('id') id: string,
@@ -33,6 +33,19 @@ export class TrackerController {
     @Query('search') search: string = '',
   ) {
     return await this.trackerService.logClick(
+      Number(page),
+      Number(limit),
+      search,
+    );
+  }
+
+  @Get('all')
+  async allLogs(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 40,
+    @Query('search') search: string = '',
+  ) {
+    return await this.trackerService.logAll(
       Number(page),
       Number(limit),
       search,

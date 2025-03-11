@@ -49,6 +49,9 @@ export class User {
 
   @Prop({ default: true })
   emailAlerts: boolean;
+
+  @Prop({ default: false })
+  isBlocked: boolean;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -13,6 +13,9 @@ export class Transitions {
   @Prop()
   payAmount: number;
 
+  @Prop()
+  providerCommotion: number;
+
   @Prop({ default: 'PENDING' })
   payoutStatus: string;
 

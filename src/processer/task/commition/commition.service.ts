@@ -83,7 +83,7 @@ export class CommitionService {
      */
     @InjectModel(Transitions.name)
     private readonly transitionsModel: Model<TransitionsDocument>,
-  ) {}
+  ) { }
 
   /**
    * This method is responsible for fetching the data from Admitad and storing it in the Transitions collection
@@ -174,6 +174,7 @@ export class CommitionService {
               {
                 $set: {
                   status: transition.status,
+
                 },
               },
             );
@@ -234,7 +235,9 @@ export class CommitionService {
       completePayment: false,
       typeDocId: typeDocId,
       transitions_id: communionId,
+      providerCommotion: transition.commission,
     });
+    console.log(transition.commission);
 
     try {
       this.notificationService.sendNotificationQuickUser({

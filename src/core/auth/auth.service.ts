@@ -20,11 +20,16 @@ export class AuthService {
     @InjectModel(User.name) private readonly userModel: Model<User>,
     private readonly jwtService: JwtService,
     private readonly logService: LogService,
-  ) {}
+  ) { }
 
   async authAUser(user: CreateUserDto) {
     const otp = this.generateOTP(4);
     let res = await this.userModel.findOne({ mobile: user.mobile });
+
+    if (res.isBlocked) {
+      throw new NotAcceptableException('Your Account is Blocked');
+    }
+
     if (!res) {
       const referCode = await this.generateReferCode();
       res = await this.userModel.create({
@@ -69,7 +74,9 @@ export class AuthService {
         throw new NotAcceptableException('Otp expired');
       }
     }
-
+    if (res.isBlocked) {
+      throw new NotAcceptableException('Your Account is Blocked');
+    }
     delete res.otp;
     delete res.expOtp;
     await this.userModel.updateOne(
@@ -111,6 +118,9 @@ export class AuthService {
     await userData.updateOne(updateData);
 
     let data = await this.userModel.findById(id).lean();
+    if (data.isBlocked) {
+      throw new NotAcceptableException('Your Account is Blocked');
+    }
     delete data.otp;
     delete data.expOtp;
     // Add A Log =========
@@ -198,4 +208,4 @@ export interface Daum {
   recipient: string;
 }
 
-export interface Error {}
+export interface Error { }

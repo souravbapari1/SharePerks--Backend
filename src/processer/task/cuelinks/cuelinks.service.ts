@@ -80,7 +80,7 @@ export class CuelinksService {
     // Get the current date and date 30 days ago
     const currentDate = new Date();
     const pastDate = new Date();
-    pastDate.setDate(currentDate.getDate() - 30);
+    pastDate.setDate(currentDate.getDate() - 60);
 
     // Format dates to ISO strings (required format by the API)
     const startDate = pastDate.toISOString().slice(0, 19); // Trimming to remove milliseconds
@@ -114,6 +114,7 @@ export class CuelinksService {
           data: JSON.parse(e.subid4),
           date: e.transaction_date,
           response: e,
+          providerCommotion: e.user_commission,
         };
       });
 

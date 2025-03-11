@@ -24,7 +24,7 @@ export class TrackerService {
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
     private readonly logService: LogService,
-  ) {}
+  ) { }
 
   async getLink({
     id,
@@ -55,16 +55,15 @@ export class TrackerService {
     }
 
     await brand.updateOne({ clicks: brand.clicks + 1 });
-    const link = `${brand.linkUrl}&subid=${userInfo._id}&subid1=${userInfo._id}&subid2=brand&subid3=${
-      brand._id
-    }&subid4=${JSON.stringify({
-      name: userInfo.name,
-      userId: userInfo._id,
-      type: 'offer',
-      docId: brand._id,
-      brand: brand._id,
-      stock: brand.stockISIN,
-    })}`;
+    const link = `${brand.linkUrl}&subid=${userInfo._id}&subid1=${userInfo._id}&subid2=brand&subid3=${brand._id
+      }&subid4=${JSON.stringify({
+        name: userInfo.name,
+        userId: userInfo._id,
+        type: 'offer',
+        docId: brand._id,
+        brand: brand._id,
+        stock: brand.stockISIN,
+      })}`;
     //==== Add LOG ====
     await this.logService.createNewLog({
       title: `${userInfo.name} click a brand - ${brand.name}`,
@@ -88,16 +87,15 @@ export class TrackerService {
     }
 
     await offer.updateOne({ clicks: offer.clicks + 1 });
-    const link = `${offer.link}&subid=${userInfo._id}&subid1=${userInfo._id}&subid2=offer&subid3=${
-      offer._id
-    }&subid4=${JSON.stringify({
-      name: userInfo.name,
-      userId: userInfo._id,
-      type: 'offer',
-      docId: offer._id,
-      brand: offer.brandId,
-      stock: offer.stockISIN,
-    })}`;
+    const link = `${offer.link}&subid=${userInfo._id}&subid1=${userInfo._id}&subid2=offer&subid3=${offer._id
+      }&subid4=${JSON.stringify({
+        name: userInfo.name,
+        userId: userInfo._id,
+        type: 'offer',
+        docId: offer._id,
+        brand: offer.brandId,
+        stock: offer.stockISIN,
+      })}`;
     //==== Add LOG ====
     await this.logService.createNewLog({
       title: `${userInfo.name} click a offer - ${offer.offerTitle}`,
@@ -121,16 +119,15 @@ export class TrackerService {
     }
 
     await coupon.updateOne({ clicks: coupon.clicks + 1 });
-    const link = `${coupon.link}&subid=${userInfo._id}&subid1=${userInfo._id}&subid2=coupon&subid3=${
-      coupon._id
-    }&subid4=${JSON.stringify({
-      name: userInfo.name,
-      userId: userInfo._id,
-      type: 'coupon',
-      docId: coupon._id,
-      brand: coupon.brandId,
-      stock: coupon.stockISIN,
-    })}`;
+    const link = `${coupon.link}&subid=${userInfo._id}&subid1=${userInfo._id}&subid2=coupon&subid3=${coupon._id
+      }&subid4=${JSON.stringify({
+        name: userInfo.name,
+        userId: userInfo._id,
+        type: 'coupon',
+        docId: coupon._id,
+        brand: coupon.brandId,
+        stock: coupon.stockISIN,
+      })}`;
     //==== Add LOG ====
     await this.logService.createNewLog({
       title: `${userInfo.name} click a offer - ${coupon.couponTitle}`,
@@ -148,5 +145,9 @@ export class TrackerService {
 
   async logClick(page: number, limit: number, search: string) {
     return await this.logService.getAllClicks(page, limit, search);
+  }
+
+  async logAll(page: number, limit: number, search: string) {
+    return await this.logService.getAllLogs(page, limit, search);
   }
 }
